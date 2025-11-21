@@ -1,0 +1,9 @@
+<h1 class="text-2xl font-bold mb-4">Students</h1>
+
+<ul class="space-y-2">
+  <% @students.each do |student| %>
+    <li class="p-2 rounded bg-gray-100">
+      <%= link_to student.email, user_path(student) %>
+    </li>
+  <% end %>
+</ul>
