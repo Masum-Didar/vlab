@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_19_065916) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_19_124709) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -81,6 +81,29 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_19_065916) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "lab_sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "ended_at"
+    t.bigint "experiment_id", null: false
+    t.datetime "started_at"
+    t.integer "status"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["experiment_id"], name: "index_lab_sessions_on_experiment_id"
+    t.index ["user_id"], name: "index_lab_sessions_on_user_id"
+  end
+
+  create_table "submissions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "data"
+    t.bigint "experiment_id", null: false
+    t.integer "status"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["experiment_id"], name: "index_submissions_on_experiment_id"
+    t.index ["user_id"], name: "index_submissions_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -101,4 +124,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_19_065916) do
   add_foreign_key "experiment_results", "experiments"
   add_foreign_key "experiment_results", "users"
   add_foreign_key "experiment_steps", "experiments"
+  add_foreign_key "lab_sessions", "experiments"
+  add_foreign_key "lab_sessions", "users"
+  add_foreign_key "submissions", "experiments"
+  add_foreign_key "submissions", "users"
 end

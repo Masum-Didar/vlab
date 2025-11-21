@@ -21,11 +21,14 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
-    <%#= javascript_importmap_tags %>
 
   </head>
 
-  <body>
+
+  <body class="min-h-screen bg-gray-100 flex">
+    <%= render "shared/sidebar" %>
+   <main class="flex-1 ml-64 p-8 overflow-y-auto">
     <%= yield %>
+   </main>
   </body>
 </html>

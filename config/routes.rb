@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "users/index"
+  get "users/show"
   get "dashboard/index"
   get "experiment_results/index"
   get "experiment_results/show"
@@ -18,6 +20,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  get "dashboard", to: "dashboard#index"
   root "dashboard#index"
 
   resources :experiments do
@@ -27,6 +30,9 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :users, only: [:index, :show]
   resources :experiment_results, only: [:index, :show]
+  resources :lab_sessions
+  resources :submissions
 
 end
