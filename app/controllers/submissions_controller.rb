@@ -1,4 +1,6 @@
 class SubmissionsController < ApplicationController
+  before_action :authenticate_user!
+
   before_action :set_submission, only: %i[ show edit update destroy ]
 
   def index

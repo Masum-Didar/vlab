@@ -1,0 +1,47 @@
+<header class="flex justify-between items-center mb-8">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Submissions</h1>
+    <p class="text-gray-500 mt-1">Student experiment submissions.</p>
+  </div>
+</header>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-200">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead>
+      <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+        <th class="px-6 py-3">Student</th>
+        <th class="px-6 py-3">Experiment</th>
+        <th class="px-6 py-3">Status</th>
+        <th class="px-6 py-3">Submitted</th>
+        <th class="px-6 py-3 text-right">Actions</th>
+      </tr>
+      </thead>
+
+      <tbody class="divide-y divide-gray-100">
+      <% @submissions.each do |s| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-3 font-medium text-gray-900"><%= s.user.email.split('@').first.capitalize %></td>
+          <td class="px-6 py-3 text-gray-600"><%= s.experiment.title %></td>
+          <td class="px-6 py-3">
+            <span class="px-2 py-1 text-xs rounded-full font-medium border <%= status_badge_class(s.status) %>">
+              <%= s.status.humanize %>
+            </span>
+          </td>
+          <td class="px-6 py-3 text-gray-500"><%= s.created_at.strftime("%b %d, %H:%M") %></td>
+          <td class="px-6 py-3 text-right">
+            <%= link_to "Review", submission_path(s), class: "text-indigo-600 hover:text-indigo-800 text-sm" %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if @submissions.empty? %>
+        <tr>
+          <td colspan="5" class="px-6 py-8 text-center text-gray-400">No submissions yet.</td>
+        </tr>
+      <% end %>
+      </tbody>
+
+    </table>
+  </div>
+</div>

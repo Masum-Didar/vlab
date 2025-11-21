@@ -8,5 +8,27 @@ class User < ApplicationRecord
 
   enum :role, { student: 0, faculty: 1 }
 
+  # Full name fallback
+  def full_name
+    if first_name.present? || last_name.present?
+      "#{first_name} #{last_name}".strip
+    else
+      email.split("@").first.capitalize
+    end
+  end
+
+  # Initials (like DR)
+  def initials
+    if first_name.present? || last_name.present?
+      "#{first_name.to_s[0]}#{last_name.to_s[0]}".upcase
+    else
+      email[0..1].upcase
+    end
+  end
+
+  # Role formatted like "Admin" / "Student"
+  def role_title
+    role.to_s.capitalize
+  end
 
 end

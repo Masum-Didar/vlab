@@ -1,12 +1,5 @@
 class DashboardController < ApplicationController
   before_action :authenticate_user!
-
-  # def index
-  #   @total_students = User.where(role: :student).count
-  #   @total_experiments = Experiment.count
-  #   @active_sessions = LabSession.where(status: :active).count
-  #   @pending_submissions = Submission.where(status: :pending).count
-  # end
   def index
     @total_students = User.where(role: :student).count
     @total_experiments = Experiment.count
