@@ -2,8 +2,11 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @students = User.where(role: :student)
-    @faculty  = User.where(role: :faculty)
+    if params[:role].present?
+      @users = User.where(role: params[:role])
+    else
+      @users = User.all
+    end
   end
 
   def show

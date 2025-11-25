@@ -1,16 +1,11 @@
-<h1 class="text-2xl font-bold mb-4">Students</h1>
-
-<ul class="space-y-2">
-  <% @students.each do |student| %>
-    <li class="p-2 rounded bg-gray-100">
-      <%= link_to student.email, user_path(student) %>
-    </li>
-  <% end %>
-</ul>
 <header class="flex justify-between items-center mb-8">
   <div>
-    <h1 class="text-3xl font-bold text-gray-900">Students</h1>
-    <p class="text-gray-500 mt-1">List of enrolled students.</p>
+    <h1 class="text-3xl font-bold text-gray-900">
+      <%= params[:role].to_s.capitalize.presence || "Users" %>
+    </h1>
+    <p class="text-gray-500 mt-1">
+      <%= params[:role] == "student" ? "List of enrolled students." : "List of faculties." %>
+    </p>
   </div>
 </header>
 
@@ -23,7 +18,7 @@
     <table class="w-full text-left text-sm">
       <thead>
       <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
-<!--        <th class="px-6 py-3">Name</th>-->
+        <th class="px-6 py-3">Full Name</th>
         <th class="px-6 py-3">Email</th>
         <th class="px-6 py-3">Joined</th>
         <th class="px-6 py-3 text-right">Actions</th>
@@ -31,9 +26,9 @@
       </thead>
 
       <tbody class="divide-y divide-gray-100">
-      <% @students.each do |stu| %>
+      <% @users.each do |stu| %>
         <tr class="hover:bg-gray-50">
-<!--          <td class="px-6 py-3 font-medium text-gray-900"><%#= stu.name %></td>-->
+          <td class="px-6 py-3 font-medium text-gray-900"><%= stu.full_name %></td>
           <td class="px-6 py-3 text-gray-600"><%= stu.email %></td>
           <td class="px-6 py-3 text-gray-500"><%= stu.created_at.strftime("%b %d, %Y") %></td>
           <td class="px-6 py-3 text-right">
@@ -42,7 +37,7 @@
         </tr>
       <% end %>
 
-      <% if @students.empty? %>
+      <% if @users.empty? %>
         <tr>
           <td colspan="4" class="px-6 py-8 text-center text-gray-400">No students found.</td>
         </tr>
