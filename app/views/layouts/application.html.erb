@@ -25,10 +25,22 @@
   </head>
 
 
-  <body class="min-h-screen bg-gray-100 flex">
-    <%= render "shared/sidebar" %>
-   <main class="flex-1 ml-64 p-8 overflow-y-auto">
-    <%= yield %>
-   </main>
+  <body class="min-h-screen bg-gray-100 flex font-sans">
+
+  <!-- 1. The Fixed Sidebar -->
+  <%= render "shared/sidebar" %>
+
+  <!-- 2. The Main Content Wrapper (Pushed right by ml-64) -->
+  <main class="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+
+    <!-- A. The New Navbar (Sticky top) -->
+    <%= render "shared/navbar" %>
+
+    <!-- B. The Page Content (Scrollable) -->
+    <div class="flex-1 overflow-y-auto p-8">
+      <%= yield %>
+    </div>
+
+  </main>
   </body>
 </html>

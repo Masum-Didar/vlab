@@ -1,0 +1,47 @@
+<!-- app/views/shared/_navbar.html.erb -->
+<header class="bg-white h-16 border-b border-gray-200 sticky top-0 z-20 flex items-center justify-between px-6">
+
+  <div class="flex items-center">
+    <h1 class="text-xl font-semibold text-gray-800">
+      <%= content_for?(:title) ? yield(:title) : "Dashboard" %>
+    </h1>
+  </div>
+
+  <!-- Right Side: User Profile & Actions -->
+  <% if user_signed_in? %>
+    <div class="flex items-center gap-6">
+
+      <!-- User Info -->
+      <%= link_to user_path(current_user), class: "flex items-center gap-3 hover:bg-gray-50 px-3 py-2 rounded-lg transition" do %>
+
+        <div class="text-right hidden sm:block">
+          <p class="text-sm font-medium text-gray-900 leading-none">
+            <%= current_user.full_name %>
+          </p>
+          <p class="text-xs text-gray-500 mt-1">
+            <%= current_user.role_title %>
+          </p>
+        </div>
+
+        <!-- Avatar -->
+        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center
+              text-indigo-700 font-bold border border-indigo-200">
+          <%= current_user.initials %>
+        </div>
+
+      <% end %>
+
+      <!-- Right: Logout button -->
+      <%= button_to destroy_user_session_path,
+                    method: :delete,
+                    data: { turbo: false },
+                    class: "p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition",title: "Sign Out" do %>
+
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1"/>
+        </svg>
+      <% end %>
+    </div>
+  <% end %>
+</header>
