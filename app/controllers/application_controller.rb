@@ -9,6 +9,17 @@ class ApplicationController < ActionController::Base
 
   protected
 
+
+  def after_sign_in_path_for(resource)
+    # This logic determines where they go,
+    # The 'layout' determines what it looks like when they get there.
+    if resource.faculty?
+      admin_dashboard_path
+    else
+      root_path
+    end
+  end
+
   def configure_permitted_parameters
     # Allow these fields during Sign Up
     devise_parameter_sanitizer.permit(:sign_up, keys: [:first_name, :last_name, :role])

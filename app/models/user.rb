@@ -30,5 +30,10 @@ class User < ApplicationRecord
   def role_title
     role.to_s.capitalize
   end
-
+  def faculty?
+    role == 'faculty' # or self.is_faculty (if you used a boolean)
+    end
+  def student?
+    role == 'student' # or self.is_student (if you used a boolean)
+  end
 end

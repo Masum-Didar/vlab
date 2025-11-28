@@ -20,8 +20,9 @@
       <thead>
       <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
         <th class="px-6 py-3">Title</th>
-        <th class="px-6 py-3">Category</th>
-        <th class="px-6 py-3">Total Steps</th>
+<!--        <th class="px-6 py-3">Category</th>-->
+        <th class="px-6 py-3">Status</th>
+<!--        <th class="px-6 py-3">Total Steps</th>-->
         <th class="px-6 py-3">Created</th>
         <th class="px-6 py-3 text-right">Actions</th>
       </tr>
@@ -31,8 +32,8 @@
       <% @experiments.each do |exp| %>
         <tr class="hover:bg-gray-50">
           <td class="px-6 py-3 font-medium text-gray-900"><%= exp.title %></td>
-          <td class="px-6 py-3 text-gray-600"><%= exp.category %></td>
-          <td class="px-6 py-3 text-gray-600"><%= exp.steps.count %></td>
+          <td class="px-6 py-3 text-gray-600"><%= exp.status %></td>
+<!--          <td class="px-6 py-3 text-gray-600"><%#= exp.steps.count %></td>-->
           <td class="px-6 py-3 text-gray-500"><%= exp.created_at.strftime("%b %d, %Y") %></td>
           <td class="px-6 py-3 text-right">
             <div class="flex gap-3 justify-end">

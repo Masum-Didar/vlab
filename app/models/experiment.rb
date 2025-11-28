@@ -8,4 +8,6 @@ class Experiment < ApplicationRecord
   has_many :experiment_results, dependent: :destroy
 
   validates :title, presence: true
+  enum :status, { pending: 0, started: 1, completed: 2, failed: 3 }
+
 end

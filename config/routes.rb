@@ -23,6 +23,28 @@ Rails.application.routes.draw do
   get "dashboard", to: "dashboard#index"
   root "dashboard#index"
 
+  # namespace :admin do
+  #   get "experiments/index"
+  #   get "experiments/show"
+  #   get "experiments/new"
+  #   get "experiments/create"
+  #   get "experiments/edit"
+  #   get "experiments/update"
+  #   get "experiments/destroy"
+  #   resources :experiments
+  #   resources :dashboard
+  #   # Optional: Set this as the root for the /faculty path
+  #   root to: 'dashboard#index'
+  # end
+  # --- Admin / Faculty Routes ---
+  namespace :admin do
+    # 1. FIX: Replace 'resources :dashboard' with this:
+    get 'dashboard', to: 'dashboard#index', as: :dashboard
+    resources :experiments
+    # Admin root
+    root to: 'dashboard#index'
+  end
+
   resources :experiments do
     member do
       get :lab
