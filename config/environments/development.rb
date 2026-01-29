@@ -3,6 +3,10 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   config.hosts << "02a3a3499702.ngrok-free.app"
+  config.hosts << "lvh.me"
+  config.hosts << /.*\.lvh\.me/  # Allow all subdomains of lvh.me
+  config.hosts << "localhost"
+  config.hosts << /.*\.localhost/  # Allow all subdomains of localhost
 
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true

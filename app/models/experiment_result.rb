@@ -1,4 +1,6 @@
 class ExperimentResult < ApplicationRecord
+  acts_as_tenant :school
+
   belongs_to :user
   belongs_to :experiment
 

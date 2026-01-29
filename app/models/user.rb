@@ -4,9 +4,14 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  # --- Tenancy & Hierarchy ---
+  acts_as_tenant :school
+  belongs_to :school
+  belongs_to :department, optional: true # Optional in case Admin has no dept
+
   has_many :experiment_results, dependent: :destroy
 
-  enum :role, { student: 0, faculty: 1 }
+  enum :role, { student: 0, faculty: 1, administrator: 2 }
 
   # Full name fallback
   def full_name

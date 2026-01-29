@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_27_125735) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_29_101640) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,14 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_125735) do
     t.jsonb "properties"
     t.string "state"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "departments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.bigint "school_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id"], name: "index_departments_on_school_id"
   end
 
   create_table "equipment", force: :cascade do |t|
@@ -54,10 +62,12 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_125735) do
     t.datetime "created_at", null: false
     t.jsonb "data"
     t.bigint "experiment_id", null: false
+    t.bigint "school_id"
     t.integer "status"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["experiment_id"], name: "index_experiment_results_on_experiment_id"
+    t.index ["school_id"], name: "index_experiment_results_on_school_id"
     t.index ["user_id"], name: "index_experiment_results_on_user_id"
   end
 
@@ -78,36 +88,52 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_125735) do
     t.integer "difficulty"
     t.integer "duration", default: 0
     t.boolean "published"
+    t.bigint "school_id"
     t.integer "status", default: 0, null: false
     t.string "title"
     t.datetime "updated_at", null: false
+    t.index ["school_id"], name: "index_experiments_on_school_id"
   end
 
   create_table "lab_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "ended_at"
     t.bigint "experiment_id", null: false
+    t.bigint "school_id"
     t.datetime "started_at"
     t.integer "status"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["experiment_id"], name: "index_lab_sessions_on_experiment_id"
+    t.index ["school_id"], name: "index_lab_sessions_on_school_id"
     t.index ["user_id"], name: "index_lab_sessions_on_user_id"
+  end
+
+  create_table "schools", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "domain"
+    t.string "name"
+    t.string "subdomain"
+    t.datetime "updated_at", null: false
+    t.index ["subdomain"], name: "index_schools_on_subdomain", unique: true
   end
 
   create_table "submissions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.jsonb "data"
     t.bigint "experiment_id", null: false
+    t.bigint "school_id"
     t.integer "status"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["experiment_id"], name: "index_submissions_on_experiment_id"
+    t.index ["school_id"], name: "index_submissions_on_school_id"
     t.index ["user_id"], name: "index_submissions_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.bigint "department_id"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
@@ -116,20 +142,30 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_125735) do
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.integer "role", default: 0
+    t.bigint "school_id"
     t.datetime "updated_at", null: false
+    t.index ["department_id"], name: "index_users_on_department_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["school_id"], name: "index_users_on_school_id"
   end
 
+  add_foreign_key "departments", "schools"
   add_foreign_key "experiment_chemicals", "chemicals"
   add_foreign_key "experiment_chemicals", "experiments"
   add_foreign_key "experiment_equipments", "equipment"
   add_foreign_key "experiment_equipments", "experiments"
   add_foreign_key "experiment_results", "experiments"
+  add_foreign_key "experiment_results", "schools"
   add_foreign_key "experiment_results", "users"
   add_foreign_key "experiment_steps", "experiments"
+  add_foreign_key "experiments", "schools"
   add_foreign_key "lab_sessions", "experiments"
+  add_foreign_key "lab_sessions", "schools"
   add_foreign_key "lab_sessions", "users"
   add_foreign_key "submissions", "experiments"
+  add_foreign_key "submissions", "schools"
   add_foreign_key "submissions", "users"
+  add_foreign_key "users", "departments"
+  add_foreign_key "users", "schools"
 end
