@@ -1,18 +1,14 @@
-
-<!-- SIDEBAR (Integrated from your snippet) -->
-<aside class="w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full z-10">
-  <div class="h-16 flex items-center px-6 border-b border-gray-100">
-    <!-- Logo / Brand -->
-    <%= link_to root_path, class: "flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition" do %>
-      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+<aside id="sidebar" class="bg-white border-end border-secondary flex-column position-fixed h-100 z-3">
+  <div class="h-16 d-flex align-items-center px-4 border-bottom border-light">
+    <%= link_to root_path, class: "d-flex align-items-center gap-2 text-primary text-decoration-none" do %>
+      <svg class="flex-shrink-0" width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
       </svg>
-      <h2 class="text-2xl font-bold tracking-tight">VLab</h2>
+      <h2 class="h5 fw-bold mb-0">VLab</h2>
     <% end %>
   </div>
 
-  <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+  <nav class="flex-grow-1 px-3 py-4 overflow-auto">
     <% links = [
       { name: 'Dashboard', path: dashboard_path, icon: "M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" },
       { name: 'Experiments', path: experiments_path, icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" },
@@ -22,11 +18,13 @@
       { name: 'Submissions', path: submissions_path, icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" }
     ] %>
 
-    <% links.each do |link| %>
-      <%= link_to link[:path], class: "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group #{current_page?(link[:path]) ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}" do %>
-        <svg class="w-5 h-5 transition-colors #{current_page?(link[:path]) ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= link[:icon] %>"></path></svg>
-        <%= link[:name] %>
+    <div class="d-flex flex-column gap-1">
+      <% links.each do |link| %>
+        <%= link_to link[:path], class: "d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none #{current_page?(link[:path]) ? 'bg-primary bg-opacity-10 text-primary fw-medium' : 'text-body-secondary'}" do %>
+          <svg class="flex-shrink-0" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= link[:icon] %>"></path></svg>
+          <%= link[:name] %>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
   </nav>
 </aside>

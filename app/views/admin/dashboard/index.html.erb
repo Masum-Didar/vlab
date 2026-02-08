@@ -1,104 +1,93 @@
 <% content_for :title, "Dashboard" %>
 
-<div class="space-y-8">
-
-  <!-- Top Stats Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-    <!-- Experiments -->
-    <div class="p-6 bg-white rounded-xl shadow-sm border">
-      <p class="text-gray-500 text-sm">Total Experiments</p>
-      <h3 class="text-3xl font-semibold mt-2"><%= @experiments_count %></h3>
+<div class="d-flex flex-column gap-4">
+  <div class="row g-3">
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card border shadow-sm">
+        <div class="card-body">
+          <p class="text-body-secondary small mb-0">Total Experiments</p>
+          <h3 class="h4 fw-semibold mt-2 mb-0"><%= @experiments_count %></h3>
+        </div>
+      </div>
     </div>
-
-    <!-- Users -->
-    <div class="p-6 bg-white rounded-xl shadow-sm border">
-      <p class="text-gray-500 text-sm">Total Users</p>
-      <h3 class="text-3xl font-semibold mt-2"><%= @users_count %></h3>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card border shadow-sm">
+        <div class="card-body">
+          <p class="text-body-secondary small mb-0">Total Users</p>
+          <h3 class="h4 fw-semibold mt-2 mb-0"><%= @users_count %></h3>
+        </div>
+      </div>
     </div>
-
-    <!-- Active Sessions -->
-    <div class="p-6 bg-white rounded-xl shadow-sm border">
-      <p class="text-gray-500 text-sm">Active Sessions</p>
-      <h3 class="text-3xl font-semibold mt-2"><%= @active_count %></h3>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card border shadow-sm">
+        <div class="card-body">
+          <p class="text-body-secondary small mb-0">Active Sessions</p>
+          <h3 class="h4 fw-semibold mt-2 mb-0"><%= @active_count %></h3>
+        </div>
+      </div>
     </div>
-
-    <!-- Pending Reviews -->
-    <div class="p-6 bg-white rounded-xl shadow-sm border">
-      <p class="text-gray-500 text-sm">Pending Reviews</p>
-      <h3 class="text-3xl font-semibold mt-2"><%= @pending_count %></h3>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card border shadow-sm">
+        <div class="card-body">
+          <p class="text-body-secondary small mb-0">Pending Reviews</p>
+          <h3 class="h4 fw-semibold mt-2 mb-0"><%= @pending_count %></h3>
+        </div>
+      </div>
     </div>
-
   </div>
 
-
-  <!-- Chart & Stats -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-    <!-- Activity Chart -->
-    <div class="bg-white p-6 rounded-xl shadow-sm border lg:col-span-2">
-      <h4 class="text-lg font-semibold mb-4">Experiment Activity</h4>
-      <div class="flex justify-center items-center h-48 text-gray-400">
-        📊 Chart placeholder (later we add real chart.js)
+  <div class="row g-3">
+    <div class="col-12 col-lg-8">
+      <div class="card border shadow-sm">
+        <div class="card-body">
+          <h4 class="h6 fw-semibold mb-3">Experiment Activity</h4>
+          <div class="d-flex justify-content-center align-items-center bg-light rounded text-body-secondary" style="height: 12rem;">
+            📊 Chart placeholder (later we add real chart.js)
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Quick Stats -->
-    <div class="bg-white p-6 rounded-xl shadow-sm border space-y-4">
-      <h4 class="text-lg font-semibold mb-4">Quick Stats</h4>
-
-      <div class="flex justify-between text-sm">
-        <span class="text-gray-500">Completed Experiments</span>
-        <span class="font-medium"><%= @completed_count %></span>
-      </div>
-
-      <div class="flex justify-between text-sm">
-        <span class="text-gray-500">Failed Experiments</span>
-        <span class="font-medium"><%= @failed_count %></span>
-      </div>
-
-      <div class="flex justify-between text-sm">
-        <span class="text-gray-500">Average Duration</span>
-        <span class="font-medium"><%= @avg_duration %> min</span>
+    <div class="col-12 col-lg-4">
+      <div class="card border shadow-sm">
+        <div class="card-body">
+          <h4 class="h6 fw-semibold mb-3">Quick Stats</h4>
+          <div class="d-flex justify-content-between small mb-2"><span class="text-body-secondary">Completed Experiments</span><span class="fw-medium"><%= @completed_count %></span></div>
+          <div class="d-flex justify-content-between small mb-2"><span class="text-body-secondary">Failed Experiments</span><span class="fw-medium"><%= @failed_count %></span></div>
+          <div class="d-flex justify-content-between small mb-0"><span class="text-body-secondary">Average Duration</span><span class="fw-medium"><%= @avg_duration %> min</span></div>
+        </div>
       </div>
     </div>
-
   </div>
 
-
-  <!-- Recent Experiments Table -->
-  <div class="bg-white p-6 rounded-xl shadow-sm border">
-    <h4 class="text-lg font-semibold mb-4">Recent Experiments</h4>
-
-    <table class="w-full text-left text-sm">
-      <thead>
-      <tr class="border-b">
-        <th class="py-2">Title</th>
-        <th class="py-2">Status</th>
-        <th class="py-2">Created</th>
-        <th class="py-2 text-right">Action</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <% @recent_experiments.each do |exp| %>
-        <tr class="border-b">
-          <td class="py-3"><%= exp.title %></td>
-          <td class="py-3">
-              <span class="px-2 py-1 text-xs rounded-full
-                <%= exp.status == 'completed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600' %>">
-                <%= exp.status.capitalize %>
-              </span>
-          </td>
-          <td class="py-3"><%= exp.created_at.strftime("%b %d, %Y") %></td>
-          <td class="py-3 text-right">
-            <%= link_to "View", admin_experiment_path(exp),
-                        class: "text-indigo-600 hover:text-indigo-800" %>
-          </td>
-        </tr>
-      <% end %>
-      </tbody>
-    </table>
+  <div class="card border shadow-sm">
+    <div class="card-body">
+      <h4 class="h6 fw-semibold mb-3">Recent Experiments</h4>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr class="border-bottom">
+              <th class="py-2">Title</th>
+              <th class="py-2">Status</th>
+              <th class="py-2">Created</th>
+              <th class="py-2 text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_experiments.each do |exp| %>
+              <tr class="border-bottom">
+                <td class="py-3"><%= exp.title %></td>
+                <td class="py-3">
+                  <span class="badge <%= exp.status == 'completed' ? 'bg-success' : 'bg-warning text-dark' %>"><%= exp.status.capitalize %></span>
+                </td>
+                <td class="py-3"><%= exp.created_at.strftime("%b %d, %Y") %></td>
+                <td class="py-3 text-end">
+                  <%= link_to "View", admin_experiment_path(exp), class: "btn btn-link btn-sm text-primary p-0" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-
 </div>

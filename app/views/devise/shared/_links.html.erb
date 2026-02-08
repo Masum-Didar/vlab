@@ -1,84 +1,24 @@
-<%#- if controller_name != 'sessions' %>
-<!--  <%#= link_to "Log in", new_session_path(resource_name) %><br />-->
-<%# end %>
-
-<%#- if devise_mapping.registerable? && controller_name != 'registrations' %>
-<!--  <%#= link_to "Sign up", new_registration_path(resource_name) %><br />-->
-<%# end %>
-
-<%#- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
-<!--  <%#= link_to "Forgot your password?", new_password_path(resource_name) %><br />-->
-<%# end %>
-
-<%#- if devise_mapping.confirmable? && controller_name != 'confirmations' %>
-<!--  <%#= link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name) %><br />-->
-<%# end %>
-
-<%#- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
-<!--  <%#= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name) %><br />-->
-<%# end %>
-
-<%#- if devise_mapping.omniauthable? %>
-  <%#- resource_class.omniauth_providers.each do |provider| %>
-<!--    <%#= button_to "Sign in with #{OmniAuth::Utils.camelize(provider)}", omniauth_authorize_path(resource_name, provider), data: { turbo: false } %><br />-->
-  <%# end %>
-<%# end %>
-
-<div class="space-y-2 text-center">
-
-  <%# Log in %>
+<div class="d-flex flex-column gap-2 text-center">
   <% if controller_name != 'sessions' %>
-    <%= link_to new_session_path(resource_name),
-                class: "text-sm text-indigo-600 hover:text-indigo-500 transition" do %>
-      Log in
-    <% end %>
+    <%= link_to "Log in", new_session_path(resource_name), class: "text-primary text-decoration-none small" %>
   <% end %>
-
-  <%# Sign up %>
   <% if devise_mapping.registerable? && controller_name != 'registrations' %>
-    <%= link_to new_registration_path(resource_name),
-                class: "text-sm text-indigo-600 hover:text-indigo-500 transition" do %>
-      Create an Account
-    <% end %>
+    <%= link_to "Create an Account", new_registration_path(resource_name), class: "text-primary text-decoration-none small" %>
   <% end %>
-
-  <%# Forgot password %>
   <% if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
-    <%= link_to new_password_path(resource_name),
-                class: "text-sm text-gray-500 hover:text-indigo-500 transition" do %>
-      Forgot your password?
-    <% end %>
+    <%= link_to "Forgot your password?", new_password_path(resource_name), class: "text-body-secondary text-decoration-none small" %>
   <% end %>
-
-  <%# Confirmation instructions %>
   <% if devise_mapping.confirmable? && controller_name != 'confirmations' %>
-    <%= link_to new_confirmation_path(resource_name),
-                class: "text-sm text-gray-500 hover:text-indigo-500 transition" do %>
-      Didn’t receive confirmation instructions?
-    <% end %>
+    <%= link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name), class: "text-body-secondary text-decoration-none small" %>
   <% end %>
-
-  <%# Unlock instructions %>
   <% if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
-    <%= link_to new_unlock_path(resource_name),
-                class: "text-sm text-gray-500 hover:text-indigo-500 transition" do %>
-      Didn’t receive unlock instructions?
-    <% end %>
+    <%= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name), class: "text-body-secondary text-decoration-none small" %>
   <% end %>
-
-  <%# OAuth providers %>
   <% if devise_mapping.omniauthable? %>
-    <div class="pt-2 space-y-2">
+    <div class="pt-2 d-flex flex-column gap-2">
       <% resource_class.omniauth_providers.each do |provider| %>
-        <%= button_to omniauth_authorize_path(resource_name, provider),
-                      method: :post,
-                      data: { turbo: false },
-                      class: "w-full py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-100 transition" do %>
-          Sign in with <%= OmniAuth::Utils.camelize(provider) %>
-        <% end %>
+        <%= button_to "Sign in with #{OmniAuth::Utils.camelize(provider)}", omniauth_authorize_path(resource_name, provider), method: :post, data: { turbo: false }, class: "btn btn-outline-secondary btn-sm" %>
       <% end %>
     </div>
   <% end %>
-
 </div>
-

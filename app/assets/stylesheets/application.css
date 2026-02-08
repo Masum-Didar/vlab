@@ -1,10 +1,25 @@
 /*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
+ * VLab application styles
+ * Bootstrap 5 is loaded via CDN in layouts.
  */
+
+/* Sidebar toggle (used by Stimulus sidebar_controller) */
+#sidebar {
+  width: 16rem;
+  transition: transform 0.3s ease-in-out;
+}
+#sidebar.sidebar-hidden {
+  transform: translateX(-100%);
+}
+
+#main-content {
+  transition: margin-left 0.3s ease-in-out;
+}
+#main-content.ms-sidebar {
+  margin-left: 16rem;
+}
+
+#sidebar-overlay {
+  transition: opacity 0.3s;
+}
+
