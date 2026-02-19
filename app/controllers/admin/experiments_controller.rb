@@ -4,6 +4,10 @@ class Admin::ExperimentsController < Admin::BaseController
     @experiments = Experiment.order(created_at: :desc)
   end
 
+  def show
+    @experiment = Experiment.find(params[:id])
+  end
+
   def new
     @experiment = Experiment.new
   end

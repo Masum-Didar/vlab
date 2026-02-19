@@ -1,0 +1,36 @@
+<div class="container" style="max-width: 48rem;">
+  <div class="card border shadow-sm">
+    <div class="card-body p-4">
+      <h2 class="h4 fw-bold mb-2"><%= @experiment.new_record? ? "Create New Experiment" : "Edit Experiment" %></h2>
+      <p class="text-body-secondary small mb-4"><%= @experiment.new_record? ? "Add details for lab experiment flow." : "Update experiment details below." %></p>
+
+      <%= form_with model: [:admin, @experiment], html: { class: "d-flex flex-column gap-4" } do |f| %>
+        <div>
+          <%= f.label :title, class: "form-label small fw-medium" %>
+          <%= f.text_field :title, class: "form-control" %>
+        </div>
+        <div>
+          <%= f.label :description, class: "form-label small fw-medium" %>
+          <%= f.text_area :description, rows: 4, class: "form-control" %>
+        </div>
+        <div>
+          <%= f.label :difficulty, class: "form-label small fw-medium" %>
+          <%= f.select :difficulty, options_for_select([["Easy", 1], ["Medium", 2], ["Hard", 3]], @experiment.difficulty), { include_blank: "Select difficulty" }, class: "form-select" %>
+        </div>
+        <div>
+          <%= f.label :status, class: "form-label small fw-medium" %>
+          <%= f.select :status, Experiment.statuses.keys.map { |s| [s.capitalize, s] }, {}, class: "form-select" %>
+        </div>
+        <div>
+          <%= f.label :duration, "Average Duration (min)", class: "form-label small fw-medium" %>
+          <%= f.number_field :duration, class: "form-control" %>
+        </div>
+        <div class="form-check">
+          <%= f.check_box :published, class: "form-check-input" %>
+          <%= f.label :published, "Publish Now", class: "form-check-label" %>
+        </div>
+        <%= f.submit @experiment.new_record? ? "Create Experiment" : "Update Experiment", class: "btn btn-primary w-100 fw-semibold" %>
+      <% end %>
+    </div>
+  </div>
+</div>
