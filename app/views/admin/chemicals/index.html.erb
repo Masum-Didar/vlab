@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h2 fw-bold text-dark mb-0">Chemicals</h1>
+  <%= link_to "+ Add Chemical", new_admin_chemical_path, class: "btn btn-primary" %>
+</div>
+
+<div class="card border shadow-sm">
+  <div class="card-body p-0">
+    <% if @chemicals.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>Formula</th>
+            <th class="py-3 text-end">Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @chemicals.each do |chemical| %>
+            <tr>
+              <td class="py-3 fw-medium"><%= chemical.name %></td>
+              <td class="py-3"><%= chemical.formula %></td>
+              <td class="py-3 text-end">
+                <%= link_to "View", admin_chemical_path(chemical), class: "btn btn-link btn-sm text-primary p-0 me-2" %>
+                <%= link_to "Edit", edit_admin_chemical_path(chemical), class: "btn btn-link btn-sm p-0 me-2" %>
+                <%= link_to "Delete",
+                            admin_chemical_path(chemical),
+                            data: { turbo_method: :delete, turbo_confirm: "Are you sure?" },
+                            class: "btn btn-link btn-sm text-danger p-0" %>
+              </td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-body-secondary text-center py-5 mb-0">
+        No chemicals found.
+      </p>
+    <% end %>
+  </div>
+</div>

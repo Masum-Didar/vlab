@@ -23,6 +23,9 @@
     <nav class="flex-grow-1 p-3">
       <%= link_to "Dashboard", admin_dashboard_path, class: "d-block px-3 py-2 rounded text-decoration-none text-body" %>
       <%= link_to "Experiments", admin_experiments_path, class: "d-block px-3 py-2 rounded text-decoration-none text-body" %>
+      <%= link_to "Chemicals", admin_chemicals_path, class: "d-block px-3 py-2 rounded text-decoration-none text-body" %>
+      <%= link_to "Equipments", admin_equipments_path, class: "d-block px-3 py-2 rounded text-decoration-none text-body" %>
+
     </nav>
     <div class="p-3 border-top">
       <%= button_to destroy_user_session_path, method: :delete, data: { turbo: false }, class: "btn btn-outline-danger btn-sm p-2", title: "Sign Out" do %>
