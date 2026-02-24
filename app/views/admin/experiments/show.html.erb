@@ -38,26 +38,6 @@
         </div>
       </div>
     <% end %>
-
-    <div class="card border shadow-sm mb-4">
-      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h2 class="h6 fw-semibold text-dark mb-0">Steps</h2>
-        <span class="badge bg-light text-dark"><%= @experiment.experiment_steps.size %> step<%= "s" if @experiment.experiment_steps.size != 1 %></span>
-      </div>
-      <div class="card-body p-0">
-        <% if @experiment.experiment_steps.any? %>
-          <ol class="list-group list-group-flush list-group-numbered mb-0">
-            <% @experiment.experiment_steps.each do |step| %>
-              <li class="list-group-item d-flex align-items-start gap-2 py-3">
-                <span class="text-body"><%= step.instruction %></span>
-              </li>
-            <% end %>
-          </ol>
-        <% else %>
-          <p class="text-body-secondary text-center py-4 mb-0">No steps added yet. Edit this experiment to add steps.</p>
-        <% end %>
-      </div>
-    </div>
   </div>
 
   <div class="col-lg-4">
@@ -79,6 +59,30 @@
           <dt class="col-5 text-body-secondary">Updated</dt>
           <dd class="col-7"><%= @experiment.updated_at.strftime("%d %b %Y, %H:%M") %></dd>
         </dl>
+      </div>
+    </div>
+
+    <div class="card border shadow-sm mb-4">
+      <div class="card-header bg-white py-3 border-bottom">
+        <h2 class="h6 fw-semibold mb-0">Phases</h2>
+      </div>
+      <div class="card-body">
+        <% @experiment.experiment_phases.each do |phase| %>
+          <div class="mb-4">
+            <h5 class="fw-bold"><%= phase.title %></h5>
+            <p class="text-muted small"><%= phase.description %></p>
+
+            <% if phase.experiment_steps.any? %>
+              <ol>
+                <% phase.experiment_steps.each do |step| %>
+                  <li><%= step.instruction %></li>
+                <% end %>
+              </ol>
+            <%# else %>
+<!--              <p class="text-muted">No steps added.</p>-->
+            <% end %>
+          </div>
+        <% end %>
       </div>
     </div>
 
@@ -122,5 +126,26 @@
         <% end %>
       </div>
     </div>
+
+    <div class="card border shadow-sm mb-4">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h2 class="h6 fw-semibold text-dark mb-0">Steps</h2>
+        <span class="badge bg-light text-dark"><%= @experiment.experiment_steps.size %> step<%= "s" if @experiment.experiment_steps.size != 1 %></span>
+      </div>
+      <div class="card-body p-0">
+        <% if @experiment.experiment_steps.any? %>
+          <ol class="list-group list-group-flush list-group-numbered mb-0">
+            <% @experiment.experiment_steps.each do |step| %>
+              <li class="list-group-item d-flex align-items-start gap-2 py-3">
+                <span class="text-body"><%= step.instruction %></span>
+              </li>
+            <% end %>
+          </ol>
+        <% else %>
+          <p class="text-body-secondary text-center py-4 mb-0">No steps added yet. Edit this experiment to add steps.</p>
+        <% end %>
+      </div>
+    </div>
+
   </div>
 </div>

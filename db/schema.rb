@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_29_101640) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_24_085938) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -58,6 +58,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_101640) do
     t.index ["experiment_id"], name: "index_experiment_equipments_on_experiment_id"
   end
 
+  create_table "experiment_phases", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.bigint "experiment_id", null: false
+    t.integer "position"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.index ["experiment_id"], name: "index_experiment_phases_on_experiment_id"
+  end
+
   create_table "experiment_results", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.jsonb "data"
@@ -72,13 +82,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_101640) do
   end
 
   create_table "experiment_steps", force: :cascade do |t|
+    t.boolean "allow_multiple", default: false
+    t.jsonb "config", default: {}
     t.datetime "created_at", null: false
     t.jsonb "expected_action"
     t.bigint "experiment_id", null: false
+    t.bigint "experiment_phase_id", null: false
     t.text "instruction"
+    t.integer "points", default: 100
     t.integer "step_number"
+    t.string "step_type", default: "observation_input"
     t.datetime "updated_at", null: false
     t.index ["experiment_id"], name: "index_experiment_steps_on_experiment_id"
+    t.index ["experiment_phase_id"], name: "index_experiment_steps_on_experiment_phase_id"
   end
 
   create_table "experiments", force: :cascade do |t|
@@ -118,6 +134,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_101640) do
     t.index ["subdomain"], name: "index_schools_on_subdomain", unique: true
   end
 
+  create_table "step_options", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "experiment_step_id", null: false
+    t.boolean "is_correct"
+    t.text "label"
+    t.string "option_type"
+    t.string "option_value"
+    t.integer "position"
+    t.datetime "updated_at", null: false
+    t.index ["experiment_step_id"], name: "index_step_options_on_experiment_step_id"
+  end
+
   create_table "submissions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.jsonb "data"
@@ -155,14 +183,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_101640) do
   add_foreign_key "experiment_chemicals", "experiments"
   add_foreign_key "experiment_equipments", "equipment"
   add_foreign_key "experiment_equipments", "experiments"
+  add_foreign_key "experiment_phases", "experiments"
   add_foreign_key "experiment_results", "experiments"
   add_foreign_key "experiment_results", "schools"
   add_foreign_key "experiment_results", "users"
+  add_foreign_key "experiment_steps", "experiment_phases"
   add_foreign_key "experiment_steps", "experiments"
   add_foreign_key "experiments", "schools"
   add_foreign_key "lab_sessions", "experiments"
   add_foreign_key "lab_sessions", "schools"
   add_foreign_key "lab_sessions", "users"
+  add_foreign_key "step_options", "experiment_steps"
   add_foreign_key "submissions", "experiments"
   add_foreign_key "submissions", "schools"
   add_foreign_key "submissions", "users"

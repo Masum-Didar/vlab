@@ -42,7 +42,38 @@ class Admin::ExperimentsController < Admin::BaseController
 
   private
 
+  # def experiment_params
+  #   params.require(:experiment).permit(
+  #     :title,
+  #     :description,
+  #     :difficulty,
+  #     :status,
+  #     :duration,
+  #     :published
+  #   )
+  # end
+
   def experiment_params
-    params.require(:experiment).permit(:title, :description, :difficulty, :status, :duration, :published)
+    params.require(:experiment).permit(
+      :title,
+      :description,
+      :difficulty,
+      :status,
+      :duration,
+      :published,
+      experiment_phases_attributes: [
+        :id,
+        :title,
+        :description,
+        :position,
+        :_destroy,
+        experiment_steps_attributes: [
+          :id,
+          :instruction,
+          :step_number,
+          :_destroy
+        ]
+      ]
+    )
   end
 end

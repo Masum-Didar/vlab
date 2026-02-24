@@ -29,8 +29,73 @@
           <%= f.check_box :published, class: "form-check-input" %>
           <%= f.label :published, "Publish Now", class: "form-check-label" %>
         </div>
+
+
+
+        <hr>
+        <h5 class="fw-bold">Phases</h5>
+
+        <div id="phases-wrapper">
+          <%= f.fields_for :experiment_phases do |phase_form| %>
+            <div class="card p-3 mb-3 phase-item">
+              <div class="mb-2">
+                <%= phase_form.label :title %>
+                <%= phase_form.text_field :title, class: "form-control" %>
+              </div>
+
+              <div class="mb-2">
+                <%= phase_form.label :description %>
+                <%= phase_form.text_area :description, rows: 2, class: "form-control" %>
+              </div>
+
+              <h6>Steps</h6>
+              <%= phase_form.fields_for :experiment_steps do |step_form| %>
+                <div class="mb-2">
+                  <%= step_form.number_field :step_number, class: "form-control mb-1", placeholder: "Step No" %>
+                  <%= step_form.text_field :instruction, class: "form-control", placeholder: "Instruction" %>
+                </div>
+              <% end %>
+
+              <button type="button" class="btn btn-sm btn-danger remove-phase">Remove Phase</button>
+            </div>
+          <% end %>
+        </div>
+
+        <button type="button" id="add-phase" class="btn btn-outline-secondary btn-sm">
+          + Add Phase
+        </button>
+
+
         <%= f.submit @experiment.new_record? ? "Create Experiment" : "Update Experiment", class: "btn btn-primary w-100 fw-semibold" %>
       <% end %>
     </div>
   </div>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const wrapper = document.getElementById("phases-wrapper");
+        const addBtn = document.getElementById("add-phase");
+
+        let index = wrapper.children.length;
+
+        addBtn.addEventListener("click", function () {
+            const template = `
+      <div class="card p-3 mb-3 phase-item">
+        <input type="text" name="experiment[experiment_phases_attributes][${index}][title]" class="form-control mb-2" placeholder="Phase Title">
+        <textarea name="experiment[experiment_phases_attributes][${index}][description]" class="form-control mb-2" placeholder="Phase Description"></textarea>
+        <button type="button" class="btn btn-sm btn-danger remove-phase">Remove Phase</button>
+      </div>
+    `;
+            wrapper.insertAdjacentHTML("beforeend", template);
+            index++;
+        });
+
+        wrapper.addEventListener("click", function (e) {
+            if (e.target.classList.contains("remove-phase")) {
+                e.target.closest(".phase-item").remove();
+            }
+        });
+    });
+</script>
