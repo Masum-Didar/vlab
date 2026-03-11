@@ -66,23 +66,82 @@
       <div class="card-header bg-white py-3 border-bottom">
         <h2 class="h6 fw-semibold mb-0">Phases</h2>
       </div>
-      <div class="card-body">
-        <% @experiment.experiment_phases.each do |phase| %>
-          <div class="mb-4">
-            <h5 class="fw-bold"><%= phase.title %></h5>
-            <p class="text-muted small"><%= phase.description %></p>
 
-            <% if phase.experiment_steps.any? %>
-              <ol>
-                <% phase.experiment_steps.each do |step| %>
-                  <li><%= step.instruction %></li>
-                <% end %>
-              </ol>
-            <%# else %>
-<!--              <p class="text-muted">No steps added.</p>-->
-            <% end %>
-          </div>
-        <% end %>
+      <div class="card-body">
+
+        <div class="accordion" id="phasesAccordion">
+          <% @experiment.experiment_phases.each_with_index do |phase, index| %>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="heading<%= index %>">
+                <button class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse<%= index %>"
+                        aria-expanded="false">
+
+                  <strong><%= phase.title %></strong>
+                </button>
+              </h2>
+
+              <div id="collapse<%= index %>"
+                   class="accordion-collapse collapse"
+                   data-bs-parent="#phasesAccordion">
+
+                <div class="accordion-body">
+
+                  <p class="text-muted small"><%= phase.description %></p>
+
+                  <% if phase.phase_items.any? %>
+                    <h6 class="fw-semibold">Phase Items</h6>
+
+                    <table class="table table-sm table-bordered mb-3">
+                      <thead>
+                      <tr>
+                        <th width="30%">Title</th>
+                        <th>Description</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <% phase.phase_items.each do |item| %>
+                        <tr>
+                          <td><%= item.title %></td>
+                          <td><%= item.description %></td>
+                        </tr>
+                      <% end %>
+                      </tbody>
+                    </table>
+                  <% end %>
+
+
+                  <% if phase.experiment_steps.any? %>
+                    <h6 class="fw-semibold">Steps</h6>
+
+                    <table class="table table-sm table-striped">
+                      <thead>
+                      <tr>
+                        <th width="10%">Step</th>
+                        <th>Instruction</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <% phase.experiment_steps.each do |step| %>
+                        <tr>
+                          <td><%= step.step_number %></td>
+                          <td><%= step.instruction %></td>
+                        </tr>
+                      <% end %>
+                      </tbody>
+                    </table>
+                  <% end %>
+
+                </div>
+              </div>
+            </div>
+
+          <% end %>
+        </div>
+
       </div>
     </div>
 
