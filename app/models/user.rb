@@ -37,7 +37,7 @@ class User < ApplicationRecord
   end
   def faculty?
     role == 'faculty' # or self.is_faculty (if you used a boolean)
-    end
+  end
   def student?
     role == 'student' # or self.is_student (if you used a boolean)
   end

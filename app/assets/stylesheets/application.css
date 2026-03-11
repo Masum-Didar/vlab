@@ -23,3 +23,6 @@
   transition: opacity 0.3s;
 }
 
+.h-4rem {
+ height: 4rem;
+}

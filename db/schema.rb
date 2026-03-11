@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_24_095950) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_03_095510) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -126,6 +126,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_24_095950) do
     t.index ["user_id"], name: "index_lab_sessions_on_user_id"
   end
 
+  create_table "phase_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.bigint "experiment_phase_id", null: false
+    t.integer "position"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.index ["experiment_phase_id"], name: "index_phase_items_on_experiment_phase_id"
+  end
+
   create_table "schools", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "domain"
@@ -194,6 +204,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_24_095950) do
   add_foreign_key "lab_sessions", "experiments"
   add_foreign_key "lab_sessions", "schools"
   add_foreign_key "lab_sessions", "users"
+  add_foreign_key "phase_items", "experiment_phases"
   add_foreign_key "step_options", "experiment_steps"
   add_foreign_key "submissions", "experiments"
   add_foreign_key "submissions", "schools"

@@ -1,19 +1,29 @@
 class Admin::ExperimentsController < Admin::BaseController
+  before_action :set_experiment, only: [:show, :edit, :update, :destroy]
 
   def index
     @experiments = Experiment.order(created_at: :desc)
   end
 
   def show
-    @experiment = Experiment.find(params[:id])
   end
 
   def new
     @experiment = Experiment.new
+
+    # Build at least one phase
+    phase = @experiment.experiment_phases.build
+
+    # Build one step inside phase
+    phase.experiment_steps.build
+
+    # Build one phase item inside phase
+    phase.phase_items.build
   end
 
   def create
     @experiment = Experiment.new(experiment_params)
+
     if @experiment.save
       redirect_to admin_experiments_path, notice: "Experiment created successfully!"
     else
@@ -22,11 +32,14 @@ class Admin::ExperimentsController < Admin::BaseController
   end
 
   def edit
-    @experiment = Experiment.find(params[:id])
+    # Ensure existing phases have at least one step & item for rendering
+    @experiment.experiment_phases.each do |phase|
+      phase.experiment_steps.build if phase.experiment_steps.empty?
+      phase.phase_items.build if phase.phase_items.empty?
+    end
   end
 
   def update
-    @experiment = Experiment.find(params[:id])
     if @experiment.update(experiment_params)
       redirect_to admin_experiments_path, notice: "Experiment updated!"
     else
@@ -35,23 +48,15 @@ class Admin::ExperimentsController < Admin::BaseController
   end
 
   def destroy
-    @experiment = Experiment.find(params[:id])
     @experiment.destroy
     redirect_to admin_experiments_path, alert: "Experiment removed!"
   end
 
   private
 
-  # def experiment_params
-  #   params.require(:experiment).permit(
-  #     :title,
-  #     :description,
-  #     :difficulty,
-  #     :status,
-  #     :duration,
-  #     :published
-  #   )
-  # end
+  def set_experiment
+    @experiment = Experiment.find(params[:id])
+  end
 
   def experiment_params
     params.require(:experiment).permit(
@@ -71,6 +76,13 @@ class Admin::ExperimentsController < Admin::BaseController
           :id,
           :instruction,
           :step_number,
+          :_destroy
+        ],
+        phase_items_attributes: [
+          :id,
+          :title,
+          :description,
+          :position,
           :_destroy
         ]
       ]
