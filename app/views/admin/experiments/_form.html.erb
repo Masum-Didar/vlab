@@ -37,39 +37,65 @@
 
         <div id="phases-wrapper">
           <%= f.fields_for :experiment_phases do |phase_form| %>
+
             <div class="card p-3 mb-3 phase-card">
 
-              <%= phase_form.label :title %>
-              <%= phase_form.text_field :title, class: "form-control mb-2" %>
-
-              <%= phase_form.label :description %>
-              <%= phase_form.text_area :description, rows: 2, class: "form-control mb-3" %>
-
-              <!-- PHASE ITEMS -->
-              <h6>Phase Items</h6>
-
-              <div class="phase-items-wrapper">
-                <%= phase_form.fields_for :phase_items do |item_form| %>
-                  <div class="phase-item border rounded p-2 mb-2 bg-light">
-                    <%= item_form.text_field :title,
-                                             class: "form-control mb-1",
-                                             placeholder: "Item Title" %>
-
-                    <%= item_form.text_area :description,
-                                            rows: 2,
-                                            class: "form-control",
-                                            placeholder: "Item Description" %>
-                  </div>
-                <% end %>
+              <div class="d-flex justify-content-between mb-2">
+                <h6 class="fw-bold">Phase</h6>
+                <button type="button" class="btn btn-sm btn-danger remove-phase">Remove</button>
               </div>
 
-              <button type="button" class="btn btn-sm btn-outline-primary add-item">
-                + Add Item
+              <%= phase_form.text_field :title,
+                                        class: "form-control mb-2",
+                                        placeholder: "Phase Title" %>
+
+              <%= phase_form.text_area :description,
+                                       rows: 2,
+                                       class: "form-control mb-3",
+                                       placeholder: "Phase Description" %>
+
+
+              <h6>Steps</h6>
+
+              <div class="phase-steps-wrapper">
+
+                <%= phase_form.fields_for :phase_steps do |step_form| %>
+
+                  <div class="step-item border rounded p-2 mb-2 bg-light">
+
+                    <%= step_form.number_field :step_number,
+                                               class: "form-control mb-1",
+                                               placeholder: "Step Number" %>
+
+                    <%= step_form.text_area :instruction,
+                                            rows: 2,
+                                            class: "form-control mb-2",
+                                            placeholder: "Step Instruction" %>
+
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger remove-step">
+                      Remove Step
+                    </button>
+
+                  </div>
+
+                <% end %>
+
+              </div>
+
+              <button type="button"
+                      class="btn btn-sm btn-outline-primary add-step">
+                + Add Step
               </button>
 
             </div>
+
           <% end %>
         </div>
+
+        <button type="button" id="add-phase" class="btn btn-outline-secondary btn-sm">
+          + Add Phase
+        </button>
 
 <!--        <div id="phases-wrapper">-->
           <%#= f.fields_for :experiment_phases do |phase_form| %>
@@ -97,9 +123,9 @@
           <%# end %>
 <!--        </div>-->
 
-        <button type="button" id="add-phase" class="btn btn-outline-secondary btn-sm">
-          + Add Phase
-        </button>
+<!--        <button type="button" id="add-phase" class="btn btn-outline-secondary btn-sm">-->
+<!--          + Add Phase-->
+<!--        </button>-->
 
 
         <%= f.submit @experiment.new_record? ? "Create Experiment" : "Update Experiment", class: "btn btn-primary w-100 fw-semibold" %>
@@ -122,58 +148,95 @@
 
             const phaseHTML = `
       <div class="card p-3 mb-3 phase-card">
+
+        <div class="d-flex justify-content-between mb-2">
+          <h6 class="fw-bold">Phase</h6>
+          <button type="button" class="btn btn-sm btn-danger remove-phase">
+            Remove
+          </button>
+        </div>
+
         <input type="text"
-          name="experiment[experiment_phases_attributes][${phaseIndex}][title]"
-          class="form-control mb-2"
-          placeholder="Phase Title">
+        name="experiment[experiment_phases_attributes][${phaseIndex}][title]"
+        class="form-control mb-2"
+        placeholder="Phase Title">
 
         <textarea
-          name="experiment[experiment_phases_attributes][${phaseIndex}][description]"
-          class="form-control mb-3"
-          placeholder="Phase Description"></textarea>
+        name="experiment[experiment_phases_attributes][${phaseIndex}][description]"
+        class="form-control mb-3"
+        placeholder="Phase Description"></textarea>
 
-        <h6>Phase Items</h6>
-        <div class="phase-items-wrapper"></div>
+        <h6>Steps</h6>
+
+        <div class="phase-steps-wrapper"></div>
 
         <button type="button"
-          class="btn btn-sm btn-outline-primary add-item">
-          + Add Item
+        class="btn btn-sm btn-outline-primary add-step">
+        + Add Step
         </button>
+
       </div>
     `;
 
             phasesWrapper.insertAdjacentHTML("beforeend", phaseHTML);
+
             phaseIndex++;
         });
 
-        // ADD ITEM (DELEGATED)
-        phasesWrapper.addEventListener("click", function (e) {
 
-            if (e.target.classList.contains("add-item")) {
+        // DELEGATION EVENTS
+        phasesWrapper.addEventListener("click", function(e){
+
+            // REMOVE PHASE
+            if(e.target.classList.contains("remove-phase")){
+
+                e.target.closest(".phase-card").remove();
+            }
+
+
+            // ADD STEP
+            if(e.target.classList.contains("add-step")){
 
                 const phaseCard = e.target.closest(".phase-card");
-                const itemsWrapper = phaseCard.querySelector(".phase-items-wrapper");
+                const stepsWrapper = phaseCard.querySelector(".phase-steps-wrapper");
 
-                const phasePosition = Array.from(phasesWrapper.children).indexOf(phaseCard);
-                const itemIndex = itemsWrapper.children.length;
+                const phasePosition =
+                    Array.from(phasesWrapper.children).indexOf(phaseCard);
 
-                const itemHTML = `
-        <div class="phase-item border rounded p-2 mb-2 bg-light">
-          <input type="text"
-            name="experiment[experiment_phases_attributes][${phasePosition}][phase_items_attributes][${itemIndex}][title]"
-            class="form-control mb-1"
-            placeholder="Item Title">
+                const stepIndex = stepsWrapper.children.length;
+
+                const stepHTML = `
+        <div class="step-item border rounded p-2 mb-2 bg-light">
+
+          <input type="number"
+          name="experiment[experiment_phases_attributes][${phasePosition}][phase_steps_attributes][${stepIndex}][step_number]"
+          class="form-control mb-1"
+          placeholder="Step Number">
 
           <textarea
-            name="experiment[experiment_phases_attributes][${phasePosition}][phase_items_attributes][${itemIndex}][description]"
-            class="form-control"
-            rows="2"
-            placeholder="Item Description"></textarea>
+          name="experiment[experiment_phases_attributes][${phasePosition}][phase_steps_attributes][${stepIndex}][instruction]"
+          class="form-control mb-2"
+          rows="2"
+          placeholder="Step Instruction"></textarea>
+
+          <button type="button"
+          class="btn btn-sm btn-outline-danger remove-step">
+          Remove Step
+          </button>
+
         </div>
       `;
 
-                itemsWrapper.insertAdjacentHTML("beforeend", itemHTML);
+                stepsWrapper.insertAdjacentHTML("beforeend", stepHTML);
             }
+
+
+            // REMOVE STEP
+            if(e.target.classList.contains("remove-step")){
+
+                e.target.closest(".step-item").remove();
+            }
+
         });
 
     });

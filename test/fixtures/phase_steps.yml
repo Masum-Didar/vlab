@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  experiment_phase: one
+  step_number: 1
+  instruction: MyText
+  position: 1
+
+two:
+  experiment_phase: two
+  step_number: 1
+  instruction: MyText
+  position: 1

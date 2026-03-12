@@ -15,10 +15,11 @@ class Admin::ExperimentsController < Admin::BaseController
     phase = @experiment.experiment_phases.build
 
     # Build one step inside phase
-    phase.experiment_steps.build
-
-    # Build one phase item inside phase
-    phase.phase_items.build
+    phase.phase_steps.build
+    # phase.experiment_steps.build
+    #
+    # # Build one phase item inside phase
+    # phase.phase_items.build
   end
 
   def create
@@ -34,8 +35,10 @@ class Admin::ExperimentsController < Admin::BaseController
   def edit
     # Ensure existing phases have at least one step & item for rendering
     @experiment.experiment_phases.each do |phase|
-      phase.experiment_steps.build if phase.experiment_steps.empty?
-      phase.phase_items.build if phase.phase_items.empty?
+      phase.phase_steps.build if phase.phase_steps.empty?
+
+      # phase.experiment_steps.build if phase.experiment_steps.empty?
+      # phase.phase_items.build if phase.phase_items.empty?
     end
   end
 
@@ -78,13 +81,19 @@ class Admin::ExperimentsController < Admin::BaseController
           :step_number,
           :_destroy
         ],
-        phase_items_attributes: [
+        phase_steps_attributes: [
           :id,
-          :title,
-          :description,
-          :position,
+          :step_number,
+          :instruction,
           :_destroy
         ]
+        # phase_items_attributes: [
+        #   :id,
+        #   :title,
+        #   :description,
+        #   :position,
+        #   :_destroy
+        # ]
       ]
     )
   end
