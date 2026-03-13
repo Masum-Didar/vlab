@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  phase_step: one
+  action_type: 1
+  label_name: MyString
+  chemical: one
+  equipment: one
+  source_container: one
+  target_container: one
+  instruction: MyText
+  image_url: MyString
+  position: 1
+
+two:
+  phase_step: two
+  action_type: 1
+  label_name: MyString
+  chemical: two
+  equipment: two
+  source_container: two
+  target_container: two
+  instruction: MyText
+  image_url: MyString
+  position: 1

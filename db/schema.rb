@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_11_115917) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_12_211355) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_115917) do
     t.string "name"
     t.jsonb "properties"
     t.string "state"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "containers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
   end
 
@@ -155,6 +161,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_115917) do
     t.index ["subdomain"], name: "index_schools_on_subdomain", unique: true
   end
 
+  create_table "step_actions", force: :cascade do |t|
+    t.integer "action_type"
+    t.bigint "chemical_id"
+    t.datetime "created_at", null: false
+    t.bigint "equipment_id"
+    t.string "image_url"
+    t.text "instruction"
+    t.string "label_name"
+    t.bigint "phase_step_id", null: false
+    t.integer "position"
+    t.bigint "source_container_id"
+    t.bigint "target_container_id"
+    t.datetime "updated_at", null: false
+    t.index ["chemical_id"], name: "index_step_actions_on_chemical_id"
+    t.index ["equipment_id"], name: "index_step_actions_on_equipment_id"
+    t.index ["phase_step_id"], name: "index_step_actions_on_phase_step_id"
+    t.index ["source_container_id"], name: "index_step_actions_on_source_container_id"
+    t.index ["target_container_id"], name: "index_step_actions_on_target_container_id"
+  end
+
   create_table "step_options", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "experiment_step_id", null: false
@@ -216,6 +242,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_115917) do
   add_foreign_key "lab_sessions", "users"
   add_foreign_key "phase_items", "experiment_phases"
   add_foreign_key "phase_steps", "experiment_phases"
+  add_foreign_key "step_actions", "chemicals"
+  add_foreign_key "step_actions", "containers", column: "source_container_id"
+  add_foreign_key "step_actions", "containers", column: "target_container_id"
+  add_foreign_key "step_actions", "equipment"
+  add_foreign_key "step_actions", "phase_steps"
   add_foreign_key "step_options", "experiment_steps"
   add_foreign_key "submissions", "experiments"
   add_foreign_key "submissions", "schools"

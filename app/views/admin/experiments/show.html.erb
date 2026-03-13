@@ -81,7 +81,7 @@
                         data-bs-toggle="collapse"
                         data-bs-target="#collapse<%= index %>">
 
-                  <strong><%= phase.title %></strong>
+                  <strong><%= phase.title %>. Phase</strong>
                 </button>
               </h2>
 
@@ -105,22 +105,89 @@
                       <tr>
                         <th width="10%">Step</th>
                         <th>Instruction</th>
+                        <th width="15%">Action</th>
                       </tr>
                       </thead>
-
                       <tbody>
 
                       <% phase.phase_steps.each do |step| %>
 
                         <tr>
                           <td>
-                          <span class="badge bg-secondary">
-                            <%= step.step_number %>
-                          </span>
+    <span class="badge bg-secondary">
+      <%= step.step_number %>
+    </span>
                           </td>
 
                           <td>
                             <%= step.instruction %>
+                          </td>
+
+                          <td class="d-flex gap-2">
+
+                            <button class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#stepActionModal"
+                                    data-step-id="<%= step.id %>">
+                              + Step Action
+                            </button>
+
+                            <button class="btn btn-sm btn-outline-secondary"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#actions_<%= step.id %>">
+                              View
+                            </button>
+
+                          </td>
+                        </tr>
+
+                        <tr class="collapse" id="actions_<%= step.id %>">
+                          <td colspan="3">
+
+                            <% if step.step_actions.any? %>
+
+                              <table class="table table-sm table-bordered mt-2">
+                                <thead class="table-light">
+                                <tr>
+                                  <th width="20%">Type</th>
+                                  <th>Instruction</th>
+                                  <th width="20%">Label</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+
+                                <% step.step_actions.each do |action| %>
+
+                                  <tr>
+                                    <td>
+              <span class="badge bg-info">
+                <%= action.action_type.humanize %>
+              </span>
+                                    </td>
+
+                                    <td>
+                                      <%= action.instruction %>
+                                    </td>
+
+                                    <td>
+                                      <%= action.label_name.presence || "-" %>
+                                    </td>
+                                  </tr>
+
+                                <% end %>
+
+                                </tbody>
+                              </table>
+
+                            <% else %>
+
+                              <p class="text-muted small mb-0">
+                                No actions added yet.
+                              </p>
+
+                            <% end %>
+
                           </td>
                         </tr>
 
@@ -142,7 +209,101 @@
 
           <% end %>
         </div>
+        <div class="modal fade" id="stepActionModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
 
+              <div class="modal-header">
+                <h5 class="modal-title">Add Step Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+
+              <%= form_with model: StepAction.new, url: admin_step_actions_path do |f| %>
+
+                <div class="modal-body">
+
+                  <%= f.hidden_field :phase_step_id, id: "modal_step_id" %>
+
+                  <div class="mb-3">
+                    <label class="form-label">Action Type</label>
+                    <%= f.select :action_type,
+                                 StepAction.action_types.keys.map { |k| [k.humanize, k] },
+                                 {},
+                                 class: "form-select" %>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Instruction</label>
+                    <%= f.text_area :instruction, class: "form-control" %>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Label Name</label>
+                    <%= f.text_field :label_name, class: "form-control" %>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Chemical</label>
+                    <%= f.collection_select :chemical_id,
+                                            @experiment.experiment_chemicals.map(&:chemical),
+                                            :id,
+                                            :name,
+                                            { include_blank: "Select Chemical" },
+                                            { class: "form-select" } %>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Equipment</label>
+                    <%= f.collection_select :equipment_id,
+                                            @experiment.experiment_equipments.map(&:equipment),
+                                            :id,
+                                            :name,
+                                            { include_blank: "Select Equipment" },
+                                            { class: "form-select" } %>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Source Container</label>
+                    <%= f.collection_select :source_container_id,
+                                            Container.all,
+                                            :id,
+                                            :name,
+                                            { include_blank: "Select Source Container" },
+                                            { class: "form-select" } %>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Target Container</label>
+                    <%= f.collection_select :target_container_id,
+                                            Container.all,
+                                            :id,
+                                            :name,
+                                            { include_blank: "Select Target Container" },
+                                            { class: "form-select" } %>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Image URL</label>
+                    <%= f.text_field :image_url, class: "form-control" %>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Position</label>
+                    <%= f.number_field :position, class: "form-control", min: 1 %>
+                  </div>
+
+                </div>
+
+                <div class="modal-footer">
+                  <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                  <button class="btn btn-primary">Save Action</button>
+                </div>
+
+              <% end %>
+
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="card border shadow-sm mb-4">
@@ -188,3 +349,22 @@
 
   </div>
 </div>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function(){
+
+        const modal = document.getElementById("stepActionModal");
+
+        modal.addEventListener("show.bs.modal", function(event){
+
+            const button = event.relatedTarget;
+
+            const stepId = button.getAttribute("data-step-id");
+
+            document.getElementById("modal_step_id").value = stepId;
+
+        });
+
+    });
+
+</script>

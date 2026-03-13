@@ -42,6 +42,7 @@ Rails.application.routes.draw do
     # 1. FIX: Replace 'resources :dashboard' with this:
     get 'dashboard', to: 'dashboard#index', as: :dashboard
     resources :experiments
+    resources :step_actions
     resources :chemicals
     resources :equipments
     # Admin root
