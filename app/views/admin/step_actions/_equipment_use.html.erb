@@ -1,0 +1,21 @@
+<% if action.step_action_equipments.any? %>
+
+  <ul class="mb-0 small">
+
+    <% action.step_action_equipments.each do |eq| %>
+
+      <li>
+        <%= eq.equipment.name %>
+      </li>
+
+    <% end %>
+
+  </ul>
+
+<% else %>
+
+  <span class="text-muted small">
+    No equipment added
+  </span>
+
+<% end %>

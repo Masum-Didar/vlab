@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  step_action: one
+  equipment: one
+  instruction: MyString
+  position: 1
+
+two:
+  step_action: two
+  equipment: two
+  instruction: MyString
+  position: 1

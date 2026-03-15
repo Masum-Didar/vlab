@@ -12,13 +12,14 @@ class Admin::StepActionsController < Admin::BaseController
   def create
     @step_action = StepAction.new(step_action_params)
 
-    if @step_action.save!
+    if @step_action.save
       redirect_back fallback_location: admin_experiments_path,
-                    notice: "Action added successfully"
+                    notice: "Action created"
     else
       redirect_back fallback_location: admin_experiments_path,
-                    alert: @step_action.errors.full_messages.to_sentence
+                    alert: "Failed to create action"
     end
+
   end
 
   def edit
@@ -52,12 +53,6 @@ class Admin::StepActionsController < Admin::BaseController
       :phase_step_id,
       :action_type,
       :instruction,
-      :label_name,
-      :chemical_id,
-      :equipment_id,
-      :source_container_id,
-      :target_container_id,
-      :image_url,
       :position
     )
   end

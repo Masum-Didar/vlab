@@ -1,0 +1,28 @@
+<% if action.step_action_labels.any? %>
+
+  <ul class="mb-0 small">
+
+    <% action.step_action_labels.each do |label| %>
+
+      <li>
+
+        <strong><%= label.label_name %></strong>
+
+        <% if label.image_url.present? %>
+          <br>
+          <img src="<%= label.image_url %>" style="max-height:50px;">
+        <% end %>
+
+      </li>
+
+    <% end %>
+
+  </ul>
+
+<% else %>
+
+  <span class="text-muted small">
+    No labels added
+  </span>
+
+<% end %>

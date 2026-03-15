@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  step_action: one
+  label_text: MyString
+  image_url: MyString
+  correct_match: false
+  position: 1
+
+two:
+  step_action: two
+  label_text: MyString
+  image_url: MyString
+  correct_match: false
+  position: 1

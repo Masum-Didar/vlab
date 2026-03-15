@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_12_211355) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_15_064651) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -161,24 +161,48 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_211355) do
     t.index ["subdomain"], name: "index_schools_on_subdomain", unique: true
   end
 
+  create_table "step_action_equipments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "equipment_id", null: false
+    t.string "instruction"
+    t.integer "position"
+    t.bigint "step_action_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["equipment_id"], name: "index_step_action_equipments_on_equipment_id"
+    t.index ["step_action_id"], name: "index_step_action_equipments_on_step_action_id"
+  end
+
+  create_table "step_action_labels", force: :cascade do |t|
+    t.boolean "correct_match"
+    t.datetime "created_at", null: false
+    t.string "image_url"
+    t.string "label_text"
+    t.integer "position"
+    t.bigint "step_action_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["step_action_id"], name: "index_step_action_labels_on_step_action_id"
+  end
+
+  create_table "step_action_transfers", force: :cascade do |t|
+    t.bigint "chemical_id", null: false
+    t.datetime "created_at", null: false
+    t.float "quantity"
+    t.integer "source_container_id"
+    t.bigint "step_action_id", null: false
+    t.integer "target_container_id"
+    t.datetime "updated_at", null: false
+    t.index ["chemical_id"], name: "index_step_action_transfers_on_chemical_id"
+    t.index ["step_action_id"], name: "index_step_action_transfers_on_step_action_id"
+  end
+
   create_table "step_actions", force: :cascade do |t|
     t.integer "action_type"
-    t.bigint "chemical_id"
     t.datetime "created_at", null: false
-    t.bigint "equipment_id"
-    t.string "image_url"
     t.text "instruction"
-    t.string "label_name"
     t.bigint "phase_step_id", null: false
     t.integer "position"
-    t.bigint "source_container_id"
-    t.bigint "target_container_id"
     t.datetime "updated_at", null: false
-    t.index ["chemical_id"], name: "index_step_actions_on_chemical_id"
-    t.index ["equipment_id"], name: "index_step_actions_on_equipment_id"
     t.index ["phase_step_id"], name: "index_step_actions_on_phase_step_id"
-    t.index ["source_container_id"], name: "index_step_actions_on_source_container_id"
-    t.index ["target_container_id"], name: "index_step_actions_on_target_container_id"
   end
 
   create_table "step_options", force: :cascade do |t|
@@ -242,10 +266,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_211355) do
   add_foreign_key "lab_sessions", "users"
   add_foreign_key "phase_items", "experiment_phases"
   add_foreign_key "phase_steps", "experiment_phases"
-  add_foreign_key "step_actions", "chemicals"
-  add_foreign_key "step_actions", "containers", column: "source_container_id"
-  add_foreign_key "step_actions", "containers", column: "target_container_id"
-  add_foreign_key "step_actions", "equipment"
+  add_foreign_key "step_action_equipments", "equipment"
+  add_foreign_key "step_action_equipments", "step_actions"
+  add_foreign_key "step_action_labels", "step_actions"
+  add_foreign_key "step_action_transfers", "chemicals"
+  add_foreign_key "step_action_transfers", "step_actions"
   add_foreign_key "step_actions", "phase_steps"
   add_foreign_key "step_options", "experiment_steps"
   add_foreign_key "submissions", "experiments"
