@@ -1,0 +1,30 @@
+<%= form_with model: step_action_transfer,
+              url: admin_step_action_step_action_transfers_path(step_action),
+              local: true do |f| %>
+
+  <div class="mb-3">
+    <%= f.label :source_container_id, "Source Container" %>
+    <%= f.number_field :source_container_id, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :target_container_id, "Target Container" %>
+    <%= f.number_field :target_container_id, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :chemical_id %>
+    <%= f.number_field :chemical_id, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :volume %>
+    <%= f.number_field :volume, class: "form-control", step: 0.1 %>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+    <%= f.submit "Save Transfer", class: "btn btn-primary" %>
+  </div>
+
+<% end %>

@@ -1,0 +1,85 @@
+<h3 class="mb-4">
+  Step Action: <%= @step_action.action_type.humanize %>
+</h3>
+
+<p>
+  <strong>Instruction:</strong>
+  <%= @step_action.instruction %>
+</p>
+
+<hr>
+
+<% if @step_action.label_match? %>
+  <h5>Labels</h5>
+
+  <%#= link_to "Add Label", new_admin_step_action_step_action_label_path(@step_action), class:"btn btn-sm btn-primary mb-3" %>
+  <%= link_to "+ Label", "#", class: "btn btn-sm btn-outline-primary", data: { bs_toggle: "modal", bs_target: "#labelModal" } %>
+
+  <%= render "admin/step_action_labels/table" %>
+<% end %>
+
+<% if @step_action.equipment_use? %>
+  <h5>Equipments</h5>
+
+  <%#= link_to "Add Equipment", new_admin_step_action_step_action_equipment_path(@step_action), class:"btn btn-sm btn-primary mb-3" %>
+  <%= link_to "+ Equipment", "#", class: "btn btn-sm btn-outline-primary", data: { bs_toggle: "modal", bs_target: "#equipmentModal" } %>
+  <%= render "admin/step_action_equipments/table" %>
+<% end %>
+
+<% if @step_action.transfer? %>
+  <h5>Transfer Setup</h5>
+
+  <%#= link_to "Setup Transfer", new_admin_step_action_step_action_transfer_path(@step_action), class:"btn btn-sm btn-primary mb-3" %>
+  <%= link_to "+ Transfer", "#", class: "btn btn-sm btn-outline-primary", data: { bs_toggle: "modal", bs_target: "#transferModal" } %>
+
+  <%= render "admin/step_action_transfers/table" %>
+<% end %>
+
+<!-- Equipment Modal -->
+<div class="modal fade" id="equipmentModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Equipment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <%= render "admin/step_action_equipments/form",
+                   step_action: @step_action,
+                   step_action_equipment: StepActionEquipment.new %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="labelModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Label</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <%= render "admin/step_action_labels/form",
+                   step_action: @step_action,
+                   step_action_label: StepActionLabel.new %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="transferModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Setup Transfer</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <%= render "admin/step_action_transfers/form",
+                   step_action: @step_action,
+                   step_action_transfer: StepActionTransfer.new %>
+      </div>
+    </div>
+  </div>
+</div>

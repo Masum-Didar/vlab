@@ -1,0 +1,20 @@
+<%= form_with model: step_action_label,
+              url: admin_step_action_step_action_labels_path(step_action),
+              local: true do |f| %>
+
+  <div class="mb-3">
+    <%= f.label :name %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :correct_equipment %>
+    <%= f.text_field :correct_equipment, class: "form-control" %>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+    <%= f.submit "Save Label", class: "btn btn-primary" %>
+  </div>
+
+<% end %>

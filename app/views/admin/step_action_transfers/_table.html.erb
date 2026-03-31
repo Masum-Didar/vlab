@@ -1,0 +1,26 @@
+<% if @step_action.step_action_transfers.any? %>
+  <table class="table table-sm table-bordered">
+    <thead class="table-light">
+    <tr>
+      <th>#</th>
+      <th>Source Container</th>
+      <th>Target Container</th>
+      <th>Chemical</th>
+      <th>Volume</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @step_action.step_action_transfers.each_with_index do |tr, index| %>
+      <tr>
+        <td><%= index + 1 %></td>
+        <td><%= tr.source_container.name if tr.source_container.present? %></td>
+        <td><%= tr.target_container.name if tr.target_container.present? %></td>
+        <td><%= tr.chemical.name if tr.chemical.present? %></td>
+        <td><%= tr.volume.presence || "-" %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="text-muted small mb-0">No transfers added yet.</p>
+<% end %>

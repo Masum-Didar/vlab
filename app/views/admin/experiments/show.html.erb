@@ -38,29 +38,6 @@
         </div>
       </div>
     <% end %>
-  </div>
-
-  <div class="col-lg-4">
-    <div class="card border shadow-sm mb-4">
-      <div class="card-header bg-white py-3 border-bottom">
-        <h2 class="h6 fw-semibold text-dark mb-0">Overview</h2>
-      </div>
-      <div class="card-body">
-        <dl class="mb-0 row g-2 small">
-          <dt class="col-5 text-body-secondary">Difficulty</dt>
-          <dd class="col-7"><%= @experiment.difficulty.present? ? (@experiment.difficulty == 1 ? "Easy" : @experiment.difficulty == 2 ? "Medium" : @experiment.difficulty == 3 ? "Hard" : "Level #{@experiment.difficulty}") : "—" %></dd>
-
-          <dt class="col-5 text-body-secondary">Duration</dt>
-          <dd class="col-7"><%= @experiment.duration.present? && @experiment.duration > 0 ? "#{@experiment.duration} min" : "—" %></dd>
-
-          <dt class="col-5 text-body-secondary">Created</dt>
-          <dd class="col-7"><%= @experiment.created_at.strftime("%d %b %Y, %H:%M") %></dd>
-
-          <dt class="col-5 text-body-secondary">Updated</dt>
-          <dd class="col-7"><%= @experiment.updated_at.strftime("%d %b %Y, %H:%M") %></dd>
-        </dl>
-      </div>
-    </div>
 
     <div class="card border shadow-sm mb-4">
       <div class="card-header bg-white py-3 border-bottom">
@@ -154,6 +131,7 @@
                                   <th width="20%">Type</th>
                                   <th width="30%">Instruction</th>
                                   <th>Details</th>
+                                  <th width="15%">Manage</th>
                                 </tr>
                                 </thead>
 
@@ -175,6 +153,9 @@
 
                                     <td>
                                       <%= render_action_details(action) %>
+                                    </td>
+                                    <td>
+                                      <%= link_to "Manage", admin_step_action_path(action), class: "btn btn-sm btn-outline-primary" %>
                                     </td>
 
                                   </tr>
@@ -284,6 +265,31 @@
 
       </div>
     </div>
+
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border shadow-sm mb-4">
+      <div class="card-header bg-white py-3 border-bottom">
+        <h2 class="h6 fw-semibold text-dark mb-0">Overview</h2>
+      </div>
+      <div class="card-body">
+        <dl class="mb-0 row g-2 small">
+          <dt class="col-5 text-body-secondary">Difficulty</dt>
+          <dd class="col-7"><%= @experiment.difficulty.present? ? (@experiment.difficulty == 1 ? "Easy" : @experiment.difficulty == 2 ? "Medium" : @experiment.difficulty == 3 ? "Hard" : "Level #{@experiment.difficulty}") : "—" %></dd>
+
+          <dt class="col-5 text-body-secondary">Duration</dt>
+          <dd class="col-7"><%= @experiment.duration.present? && @experiment.duration > 0 ? "#{@experiment.duration} min" : "—" %></dd>
+
+          <dt class="col-5 text-body-secondary">Created</dt>
+          <dd class="col-7"><%= @experiment.created_at.strftime("%d %b %Y, %H:%M") %></dd>
+
+          <dt class="col-5 text-body-secondary">Updated</dt>
+          <dd class="col-7"><%= @experiment.updated_at.strftime("%d %b %Y, %H:%M") %></dd>
+        </dl>
+      </div>
+    </div>
+
     <div class="card border shadow-sm mb-4">
       <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <h2 class="h6 fw-semibold text-dark mb-0">Chemicals</h2>

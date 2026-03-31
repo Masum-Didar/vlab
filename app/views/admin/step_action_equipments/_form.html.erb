@@ -1,0 +1,18 @@
+<%= form_with model: step_action_equipment,
+              url: admin_step_action_step_action_equipments_path(step_action),
+              local: true do |f| %>
+  <div class="mb-3">
+    <%= f.label :equipment_id, "Equipment" %>
+    <%= f.collection_select :equipment_id, Equipment.all, :id, :name, prompt: "Select Equipment", class: "form-select" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :quantity %>
+    <%= f.number_field :quantity, class: "form-control", min: 0 %>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+    <%= f.submit "Save Equipment", class: "btn btn-primary" %>
+  </div>
+<% end %>

@@ -12,7 +12,7 @@ class Admin::StepActionsController < Admin::BaseController
   def create
     @step_action = StepAction.new(step_action_params)
 
-    if @step_action.save
+    if @step_action.save!
       redirect_back fallback_location: admin_experiments_path,
                     notice: "Action created"
     else
@@ -22,6 +22,9 @@ class Admin::StepActionsController < Admin::BaseController
 
   end
 
+  def show
+    @step_action = StepAction.find(params[:id])
+  end
   def edit
   end
 
