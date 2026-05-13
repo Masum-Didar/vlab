@@ -6,7 +6,7 @@
       <th>Source Container</th>
       <th>Target Container</th>
       <th>Chemical</th>
-      <th>Volume</th>
+      <th>Quantity / Volume</th>
     </tr>
     </thead>
     <tbody>
@@ -16,7 +16,7 @@
         <td><%= tr.source_container.name if tr.source_container.present? %></td>
         <td><%= tr.target_container.name if tr.target_container.present? %></td>
         <td><%= tr.chemical.name if tr.chemical.present? %></td>
-        <td><%= tr.volume.presence || "-" %></td>
+        <td><%= tr.quantity.presence || "-" %></td>
       </tr>
     <% end %>
     </tbody>

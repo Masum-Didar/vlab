@@ -1,0 +1,37 @@
+<%= form_with model: [:admin, @container], class: "d-flex flex-column gap-3" do |f| %>
+  <% if @container.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% @container.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, class: "form-label fw-medium" %>
+    <%= f.text_field :name, class: "form-control", placeholder: "Beaker A" %>
+  </div>
+
+  <div>
+    <%= f.label :container_type, "Container Type", class: "form-label fw-medium" %>
+    <%= f.select :container_type,
+                 options_for_select(
+                   [["Beaker", "beaker"],
+                    ["Test Tube", "test_tube"],
+                    ["Flask", "flask"],
+                    ["Pipette", "pipette"],
+                    ["Measuring Cylinder", "measuring_cylinder"],
+                    ["General", "general"]],
+                   @container.container_type
+                 ),
+                 { include_blank: "Select Type" },
+                 class: "form-select" %>
+  </div>
+
+  <div>
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_containers_path, class: "btn btn-light ms-2" %>
+  </div>
+<% end %>

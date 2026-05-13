@@ -1,154 +1,438 @@
-# Virtual Chemistry Lab – Rails Web Application Blueprint
+# 🧪 Virtual Chemistry Lab
 
-A complete project blueprint for building a web-based virtual chemistry lab using Ruby on Rails 7/8. This document provides structure, database design, routes, and implementation details for developers and educators.
-1. Project Overview
+A scalable, interactive **Virtual Chemistry Lab platform** built with Ruby on Rails.  
+This system allows teachers to design structured experiments and students to perform them step-by-step in a simulated environment.
 
-Goal: Build a web-based virtual chemistry lab where students can perform experiments safely and visually.
-Features:
-- 3D virtual lab with chemicals and equipment
-- Interactive chemical mixing simulation
-- Experiment step guidance
-- Reaction observation and result recording
-- Faculty dashboard for experiment management
+---
 
+## 🚀 Project Overview
 
+The goal of this project is to create a **safe, guided, and interactive lab experience** where:
 
-2. Technology Stack
+- 👨‍🏫 Teachers can build experiments visually
+- 👨‍🎓 Students can perform experiments step-by-step
+- 🧠 Learning happens through structured interaction
 
-Backend: Ruby on Rails 7/8
-Frontend: Hotwire (Turbo + Stimulus) with Three.js integration
-Database: PostgreSQL
-Authentication: Devise
-Authorization: Pundit
-3D Graphics: Three.js
-Hosting: Render / Heroku / DigitalOcean
+---
 
+## 🧩 Core Concept
 
+The entire system is built on a **hierarchical experiment flow**:
 
-3. Database Design
-
-Main Models:
-- User: name, email, role (student/faculty)
-- Experiment: name, description, instructions
-- ExperimentStep: experiment_id, step_number, instruction
-- ExperimentResult: user_id, experiment_id, result_data (JSON)
-- Chemical: name, formula, color, state
-- Equipment: name, type, image_url
-
-Relationships:
-- User has_many ExperimentResults
-- Experiment has_many ExperimentSteps
-- Experiment has_many Chemicals through ExperimentChemicals
-- Experiment has_many Equipment through ExperimentEquipments
+Experiment
+└── Phase
+└── Phase Step
+└── Step Action (Interaction Layer)
 
 
+Each level breaks down the experiment into smaller, manageable, and interactive pieces.
 
-4. Routes
+---
 
-root "dashboard#index"
+## 🛠 Tech Stack
 
-Resources :experiments do
-member do
-get :lab
-post :run_step
+- **Backend:** Ruby on Rails 7/8
+- **Frontend:** Hotwire (Turbo + Stimulus)
+- **Database:** PostgreSQL
+- **Authentication:** Devise
+- **Authorization:** Pundit
+- **Future Integration:** Three.js (3D Lab)
+
+---
+
+## 🧱 Database Structure
+
+### 👤 User
+Represents system users.
+
+**Fields:**
+- name
+- email
+- role (`student`, `faculty`)
+
+**Relations:**
+- has_many :experiment_results
+
+---
+
+### 🧪 Experiment
+Main container for an experiment.
+
+**Fields:**
+- title
+- description
+- difficulty
+- duration
+- status
+- published
+
+**Relations:**
+- has_many :experiment_phases
+- has_many :phase_steps (through phases)
+- has_many :experiment_chemicals
+- has_many :experiment_equipments
+
+---
+
+### 🧩 ExperimentPhase
+Represents a logical section of an experiment.
+
+**Fields:**
+- experiment_id
+- title
+- description
+- position
+
+**Relations:**
+- belongs_to :experiment
+- has_many :phase_steps
+
+---
+
+### 🪜 PhaseStep
+Represents a single step inside a phase.
+
+**Fields:**
+- experiment_phase_id
+- step_number
+- instruction
+
+**Relations:**
+- belongs_to :experiment_phase
+- has_many :step_actions
+
+---
+
+### ⚡ StepAction (Core Engine)
+
+Represents an **interactive action** inside a step.
+
+**Fields:**
+- phase_step_id
+- action_type (enum)
+- instruction
+- position
+
+**Enum Types:**
+- `label_match`
+- `equipment_use`
+- `transfer`
+
+**Relations:**
+- belongs_to :phase_step
+- has_many :step_action_labels
+- has_many :step_action_equipments
+- has_many :step_action_transfers
+
+---
+
+## 🔗 Action-Specific Models
+
+### 🏷 StepActionLabel
+Used for label-image matching.
+
+**Fields:**
+- step_action_id
+- label_name
+- image_url
+
+**Relations:**
+- belongs_to :step_action
+
+---
+
+### ⚙️ StepActionEquipment
+Used for equipment-based actions.
+
+**Fields:**
+- step_action_id
+- equipment_id
+
+**Relations:**
+- belongs_to :step_action
+- belongs_to :equipment
+
+---
+
+### 🔁 StepActionTransfer
+Used for transfer actions.
+
+**Fields:**
+- step_action_id
+- source_container_id
+- target_container_id
+
+**Relations:**
+- belongs_to :step_action
+- belongs_to :source_container (Container)
+- belongs_to :target_container (Container)
+
+---
+
+## 🧪 Supporting Models
+
+### Chemical
+- name
+- formula
+- state
+- color
+
+---
+
+### Equipment
+- name
+- category
+- image_url
+
+---
+
+### Container
+- name
+- container_type
+- Represents reusable lab vessels such as beakers, test tubes, flasks, measuring cylinders, and pipettes.
+- Containers are not chemicals. A transfer action uses a container as a physical location and a chemical as the substance being moved.
+
+---
+
+### ExperimentChemical
+Join table for experiment ↔ chemical
+
+- experiment_id
+- chemical_id
+- quantity_default
+
+---
+
+### ExperimentEquipment
+Join table for experiment ↔ equipment
+
+- experiment_id
+- equipment_id
+
+---
+
+### ExperimentResult
+Stores student experiment output
+
+- user_id
+- experiment_id
+- result_data (JSON)
+
+---
+
+## 🔄 Relationships Overview
+
+Experiment
+
+├── Phases
+
+│ ├── Steps
+
+│ │ ├── StepActions
+
+│ │ │ ├── Labels
+
+│ │ │ ├── Equipments
+
+│ │ │ └── Transfers
+
+│
+├── Chemicals
+
+└── Equipments
+
+
+---
+
+## 🎯 Step Action System (Key Feature)
+
+This is the **heart of the system**.
+
+Each `StepAction` defines **what the student must do**.
+
+### Supported Action Types:
+
+#### 🏷 Label Match
+- Match correct label with image
+- Helps identify chemicals/equipment
+
+#### ⚙️ Equipment Use
+- Use specific equipment based on instruction
+
+#### 🔁 Transfer
+- Move substances between containers
+- Simulates real lab workflow
+
+---
+
+## 🧪 Experiment Setup
+
+Before a teacher publishes an experiment, the experiment needs four setup layers:
+
+1. **Experiment resources**
+   - Add required chemicals in `Admin → Chemicals`.
+   - Add required equipment in `Admin → Equipments`.
+   - Link those chemicals/equipment to the experiment.
+
+2. **Reusable containers**
+   - Containers should be created initially, similar to chemicals/equipment.
+   - Examples: `Beaker A`, `Beaker B`, `Test Tube 1`, `Conical Flask`, `Measuring Cylinder`, `Pipette`.
+   - Containers are reusable across experiments because they describe lab vessels, not chemical stock.
+   - The project seeds default containers through `db/seeds.rb`, so a fresh setup can run:
+
+```bash
+bin/rails db:seed
+```
+
+3. **Experiment flow**
+   - Create the experiment.
+   - Add phases.
+   - Add phase steps.
+   - Add step actions to each phase step.
+
+4. **Action details**
+   - `label_match`: add labels/images.
+   - `equipment_use`: select equipment needed for the action.
+   - `transfer`: select source container, target container, chemical, and quantity.
+
+### Source Container vs Target Container
+
+For a transfer action:
+
+- **Source Container** means where the chemical starts.
+- **Target Container** means where the chemical should be moved.
+- **Chemical** means what substance is being transferred.
+- **Quantity / Volume** means how much should be transferred.
+
+Example:
+
+`Transfer 10 ml HCl from Beaker A to Test Tube 1`
+
+- Source Container: `Beaker A`
+- Target Container: `Test Tube 1`
+- Chemical: `HCl`
+- Quantity / Volume: `10`
+
+The source and target container must be different. This keeps the transfer action meaningful and prevents invalid setup like transferring a chemical from `Beaker A` to `Beaker A`.
+
+---
+
+## 🧠 Rendering Strategy
+
+Action UI is dynamically rendered:
+
+```ruby
+def render_action_details(action)
+  case action.action_type
+  when "label_match"
+    render "step_actions/label_match"
+  when "equipment_use"
+    render "step_actions/equipment_use"
+  when "transfer"
+    render "step_actions/transfer"
+  end
 end
-end
+```
 
-resources :experiment_results, only: [:index, :show]
+---
 
+## 🪟 Modal System (Reusable)
 
+- Shared modal component
+- Loaded dynamically via Stimulus
+- Used for create/edit forms
+- Partial: `shared/_modal.html.erb`
 
-5. Frontend Structure
+---
 
-UI Components:
-- Navbar: Dashboard, Experiments, Results, Profile
-- Lab Page: 3D simulation area (Three.js)
-- Right Panel: Instructions, observations, results
+## 🧭 User Flow
 
-Flow:
-1. Student selects experiment
-2. Loads 3D scene with equipment and chemicals
-3. User interacts via drag/drop or mix buttons
-4. Rails backend processes reaction (JSON)
-5. Result shown visually and textually
+### 👨‍🎓 Student
+- Select experiment
+- Follow phases and steps
+- Perform actions
+- Observe results
 
+### 👨‍🏫 Teacher
+- Create experiment
+- Add phases
+- Add steps
+- Add step actions
+- Configure chemicals, equipment, and transfer containers
 
+---
 
-6. Chemical Reaction Logic
+## 📁 Project Structure
 
-Example JSON structure:
-
-{
-"HCl + NaOH": {
-"products": ["NaCl", "H2O"],
-"visual": { "colorChange": "none", "gas": false, "temperature": "heat generated" }
-}
-}
-
-
-
-7. Admin / Faculty Panel
-
-- Create/Edit Experiments
-- Manage Chemicals and Equipment
-- View Student Results
-- Monitor Experiment Usage
-
-
-
-8. Authentication & Roles
-
-Devise handles user accounts.
-Pundit controls access:
-- Student: can perform experiments and view results
-- Faculty: can manage experiments and review student activity
-
-
-
-9. Suggested File Structure
-
+```text
 app/
-controllers/
-experiments_controller.rb
-experiment_results_controller.rb
-models/
-user.rb
-experiment.rb
-chemical.rb
-equipment.rb
-experiment_step.rb
-experiment_result.rb
-views/
-experiments/
-index.html.erb
-show.html.erb
-lab.html.erb
-experiment_results/
-index.html.erb
-show.html.erb
-javascript/
-controllers/
-lab_controller.js
-packs/
-lab.js
+  models/
+    experiment.rb
+    experiment_phase.rb
+    phase_step.rb
+    step_action.rb
+    step_action_label.rb
+    step_action_equipment.rb
+    step_action_transfer.rb
+    chemical.rb
+    equipment.rb
+    container.rb
+
+  controllers/
+    admin/
+      experiments_controller.rb
+      step_actions_controller.rb
+      containers_controller.rb
+
+  views/
+    admin/step_actions/
+      _form.html.erb
+      _label_match.html.erb
+      _equipment_use.html.erb
+      _transfer.html.erb
+
+    shared/
+      _modal.html.erb
+
+  javascript/
+    controllers/
+      modal_controller.js
+```
+
+---
+
+## 🛣 Development Roadmap
+
+### Phase 1
+- Experiment CRUD
+- Phase & Step structure
+
+### Phase 2
+- StepAction system
+- Label / Equipment / Transfer
+
+### Phase 3
+- Interactive UI with Stimulus
+
+### Phase 4
+- Simulation engine
+
+### Phase 5
+- 3D Lab with Three.js
+
+---
+
+## 🔮 Future Scope
+
+- 🔬 Real-time simulation engine
+- 🎮 Gamified learning system
+- 🧠 AI-based guidance
+- 🥽 VR/AR lab
+- 📊 LMS integration
 
 
+💡 Final Note
 
-10. Development Roadmap
+This is not just a CRUD app.
 
-Month 1: Setup Rails + Devise, build experiment CRUD
-Month 2: Implement simulation logic and JSON-based reactions
-Month 3: Add Three.js visuals, faculty dashboard, and testing
-
-
-
-11. Long-Term Goals
-
-- VR/AR integration using WebXR
-- LMS integration for grading
-- Advanced chemical simulations (gas release, temperature changes)
-- Mobile-friendly interface
-
-
-
-This blueprint provides a solid foundation for developing a complete, university-level virtual chemistry lab using Ruby on Rails.
+This is a modular experiment builder system that can evolve into a full-scale virtual lab platform.

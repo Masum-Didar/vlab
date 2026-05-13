@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_15_064651) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_13_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,6 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_064651) do
   end
 
   create_table "containers", force: :cascade do |t|
+    t.string "container_type", default: "general", null: false
     t.datetime "created_at", null: false
     t.string "name"
     t.datetime "updated_at", null: false
@@ -143,12 +144,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_064651) do
   end
 
   create_table "phase_steps", force: :cascade do |t|
+    t.string "completed_image_url"
+    t.text "completion_criteria"
     t.datetime "created_at", null: false
     t.bigint "experiment_phase_id", null: false
+    t.string "image_url"
     t.text "instruction"
     t.integer "position"
     t.integer "step_number"
+    t.integer "timer_duration"
     t.datetime "updated_at", null: false
+    t.string "video_url"
     t.index ["experiment_phase_id"], name: "index_phase_steps_on_experiment_phase_id"
   end
 

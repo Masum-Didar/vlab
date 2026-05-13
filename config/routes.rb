@@ -49,6 +49,7 @@ Rails.application.routes.draw do
       resources :step_action_transfers
     end
     resources :chemicals
+    resources :containers
     resources :equipments
     # Admin root
     root to: 'dashboard#index'

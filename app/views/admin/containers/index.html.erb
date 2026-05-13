@@ -1,0 +1,33 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h2 fw-bold text-dark mb-0">Containers</h1>
+  <%= link_to "+ Add Container", new_admin_container_path, class: "btn btn-primary" %>
+</div>
+
+<div class="card border shadow-sm">
+  <div class="card-body p-0">
+    <% if @containers.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @containers.each do |container| %>
+            <tr>
+              <td class="py-3 fw-medium"><%= container.name %></td>
+              <td class="py-3"><%= container.container_type.to_s.humanize %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-body-secondary text-center py-5 mb-0">
+        No containers found. Add the reusable lab vessels used in transfer actions.
+      </p>
+    <% end %>
+  </div>
+</div>

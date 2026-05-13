@@ -4,22 +4,40 @@
 
   <div class="mb-3">
     <%= f.label :source_container_id, "Source Container" %>
-    <%= f.number_field :source_container_id, class: "form-control" %>
+    <%= f.collection_select :source_container_id,
+                            @containers,
+                            :id,
+                            ->(c) { "#{c.name} (#{c.container_type})" },
+                            { prompt: "Select Source Container" },
+                            { class: "form-select" } %>
   </div>
 
   <div class="mb-3">
     <%= f.label :target_container_id, "Target Container" %>
-    <%= f.number_field :target_container_id, class: "form-control" %>
+    <%= f.collection_select :target_container_id,
+                            @containers,
+                            :id,
+                            ->(c) { "#{c.name} (#{c.container_type})" },
+                            { prompt: "Select Target Container" },
+                            { class: "form-select" } %>
   </div>
 
   <div class="mb-3">
-    <%= f.label :chemical_id %>
-    <%= f.number_field :chemical_id, class: "form-control" %>
+    <%= f.label :chemical_id, "Chemical" %>
+    <%= f.collection_select :chemical_id,
+                            @chemicals,
+                            :id,
+                            :name,
+                            { prompt: "Select Chemical" },
+                            { class: "form-select" } %>
   </div>
 
   <div class="mb-3">
-    <%= f.label :volume %>
-    <%= f.number_field :volume, class: "form-control", step: 0.1 %>
+    <%= f.label :quantity, "Quantity / Volume" %>
+    <%= f.number_field :quantity,
+                       class: "form-control",
+                       step: 0.1,
+                       placeholder: "e.g. 10 ml" %>
   </div>
 
   <div class="modal-footer">

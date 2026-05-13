@@ -1,8 +1,8 @@
 class StepAction < ApplicationRecord
   belongs_to :phase_step
 
-  belongs_to :chemical, optional: true
-  belongs_to :equipment, optional: true
+  # belongs_to :chemical, optional: true
+  # belongs_to :equipment, optional: true
 
   has_many :step_action_labels, dependent: :destroy
   has_many :step_action_equipments, dependent: :destroy

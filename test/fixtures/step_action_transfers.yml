@@ -2,14 +2,14 @@
 
 one:
   step_action: one
-  source_container_id: 1
-  target_container_id: 1
+  source_container: one
+  target_container: two
   chemical: one
   quantity: 1.5
 
 two:
   step_action: two
-  source_container_id: 1
-  target_container_id: 1
+  source_container: two
+  target_container: one
   chemical: two
   quantity: 1.5

@@ -24,6 +24,9 @@ class Admin::StepActionsController < Admin::BaseController
 
   def show
     @step_action = StepAction.find(params[:id])
+
+    @containers = Container.all
+    @chemicals  = Chemical.all
   end
   def edit
   end

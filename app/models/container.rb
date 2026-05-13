@@ -1,4 +1,12 @@
 class Container < ApplicationRecord
-  has_many :source_step_actions, class_name: "StepAction", foreign_key: :source_container_id
-  has_many :target_step_actions, class_name: "StepAction", foreign_key: :target_container_id
+  validates :name, presence: true, uniqueness: true
+  validates :container_type, presence: true
+
+  has_many :source_transfers,
+           class_name: "StepActionTransfer",
+           foreign_key: :source_container_id
+
+  has_many :target_transfers,
+           class_name: "StepActionTransfer",
+           foreign_key: :target_container_id
 end
