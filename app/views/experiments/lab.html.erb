@@ -1,2 +1,120 @@
-<h1>Experiments#lab</h1>
-<p>Find me in app/views/experiments/lab.html.erb</p>
+<% content_for :title, "#{@experiment.title} - Lab" %>
+
+<% phases = @experiment.experiment_phases.includes(:phase_steps).order(:position) %>
+<% labels = ["Chamber lid", "DNA samples", "Electrophoresis buffer", "Electrophoresis chamber", "Ethidium bromide", "Gel casting tray", "Gel comb", "Hot liquid agarose", "Masking tape", "Micropipette", "Micropipette tips"] %>
+<% equipment_positions = {
+  "Electrophoresis buffer" => "left: 23%; top: 10%;",
+  "Ethidium bromide" => "left: 35%; top: 31%;",
+  "Electrophoresis chamber" => "left: 28%; top: 68%;",
+  "Chamber lid" => "left: 54%; top: 10%;",
+  "Hot liquid agarose" => "left: 83%; top: 12%;",
+  "Micropipette" => "left: 62%; top: 48%;",
+  "Masking tape" => "left: 74%; top: 54%;",
+  "Gel comb" => "left: 88%; top: 61%;",
+  "Gel casting tray" => "left: 78%; top: 72%;",
+  "DNA samples" => "left: 54%; top: 67%;",
+  "Micropipette tips" => "left: 18%; top: 59%;"
+} %>
+
+<div class="gel-lab" data-controller="lab">
+  <header class="gel-lab__header">
+    <div>
+      <p class="gel-lab__eyebrow">DNA Biology and Technology</p>
+      <h1><%= @experiment.title %></h1>
+    </div>
+    <%= link_to "Back to experiments", experiments_path, class: "btn btn-outline-secondary btn-sm" %>
+  </header>
+
+  <div class="gel-lab__shell">
+    <aside class="gel-lab__labels" aria-label="Equipment labels">
+      <h2>Labels</h2>
+      <p>Drag labels onto the matching orange markers.</p>
+      <div class="gel-lab__label-list">
+        <% labels.each do |label| %>
+          <button class="gel-lab__label" draggable="true" data-lab-label="<%= label %>" data-action="dragstart->lab#dragLabel">
+            <span class="gel-lab__grip" aria-hidden="true">::</span>
+            <%= label %>
+          </button>
+        <% end %>
+      </div>
+    </aside>
+
+    <section class="gel-lab__bench" aria-label="Gel electrophoresis bench setup">
+      <div class="gel-lab__shelf">
+        <div class="gel-lab__wire gel-lab__wire--red"></div>
+        <div class="gel-lab__wire gel-lab__wire--black"></div>
+      </div>
+
+      <div class="gel-object gel-object--buffer"></div>
+      <div class="gel-object gel-object--etbr"></div>
+      <div class="gel-object gel-object--bag"></div>
+      <div class="gel-object gel-object--tips"></div>
+      <div class="gel-object gel-object--chamber"></div>
+      <div class="gel-object gel-object--power"></div>
+      <div class="gel-object gel-object--pipette"></div>
+      <div class="gel-object gel-object--samples"></div>
+      <div class="gel-object gel-object--tape"></div>
+      <div class="gel-object gel-object--tray"></div>
+      <div class="gel-object gel-object--comb"></div>
+      <div class="gel-object gel-object--hotplate"></div>
+      <div class="gel-object gel-object--agarose"></div>
+      <div class="gel-object gel-object--uv"></div>
+
+      <% equipment_positions.each do |label, style| %>
+        <div class="gel-lab__drop" style="<%= style %>" data-lab-target="dropZone" data-label="<%= label %>" data-action="dragover->lab#allowDrop drop->lab#dropLabel">
+          <span></span>
+        </div>
+      <% end %>
+    </section>
+
+    <aside class="gel-lab__steps">
+      <div class="gel-lab__phase-tabs" role="tablist" aria-label="Experiment phases">
+        <% phases.each_with_index do |phase, index| %>
+          <button class="gel-lab__phase-tab <%= "is-active" if index.zero? %>" data-lab-target="phaseTab" data-phase-index="<%= index %>" data-action="click->lab#selectPhase">
+            <%= phase.position %>
+          </button>
+        <% end %>
+      </div>
+
+      <% phases.each_with_index do |phase, index| %>
+        <section class="gel-lab__phase <%= "is-active" if index.zero? %>" data-lab-target="phasePanel" data-phase-index="<%= index %>">
+          <p class="gel-lab__phase-number">Phase <%= phase.position %></p>
+          <h2><%= phase.title %></h2>
+          <p><%= phase.description %></p>
+          <ol class="gel-lab__checklist">
+            <% phase.phase_steps.order(:step_number).each do |step| %>
+              <li>
+                <label>
+                  <input type="checkbox" data-action="change->lab#updateProgress">
+                  <span><%= step.instruction %></span>
+                </label>
+              </li>
+            <% end %>
+          </ol>
+        </section>
+      <% end %>
+
+      <div class="gel-lab__actions">
+        <button class="btn btn-outline-secondary btn-sm" data-action="click->lab#previousPhase">Previous</button>
+        <button class="btn btn-primary btn-sm" data-action="click->lab#nextPhase">Next phase</button>
+      </div>
+    </aside>
+  </div>
+
+  <section class="gel-lab__data">
+    <div>
+      <h2>Lab Data</h2>
+      <p>Compare unknown sample bands with TNF1 and TNF2 controls after UV illumination.</p>
+    </div>
+    <div class="gel-lab__bands" aria-label="DNA band comparison">
+      <% ["TNF1", "TNF2", "Sample 1", "Sample 2", "Sample 3"].each_with_index do |sample, index| %>
+        <div class="gel-lab__lane">
+          <span><%= sample %></span>
+          <i style="--band-top: <%= 20 + (index % 2) * 18 %>%;"></i>
+          <i style="--band-top: <%= 58 - (index % 3) * 8 %>%;"></i>
+        </div>
+      <% end %>
+    </div>
+    <textarea class="form-control" rows="3" placeholder="Write observations and conclusion"></textarea>
+  </section>
+</div>

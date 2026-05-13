@@ -1,2 +1,61 @@
-<h1>Experiments#show</h1>
-<p>Find me in app/views/experiments/show.html.erb</p>
+<% content_for :title, @experiment.title %>
+
+<header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <div>
+    <p class="text-uppercase text-secondary fw-bold small mb-1">Experiment</p>
+    <h1 class="h2 fw-bold text-dark mb-2"><%= @experiment.title %></h1>
+    <p class="text-body-secondary mb-0" style="max-width: 48rem;"><%= @experiment.description %></p>
+  </div>
+  <%= link_to "Start Lab", lab_experiment_path(@experiment), class: "btn btn-primary" %>
+</header>
+
+<section class="row g-3 mb-4">
+  <div class="col-sm-4">
+    <div class="card border shadow-sm h-100">
+      <div class="card-body">
+        <p class="text-body-secondary small mb-1">Duration</p>
+        <strong><%= @experiment.duration %> minutes</strong>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card border shadow-sm h-100">
+      <div class="card-body">
+        <p class="text-body-secondary small mb-1">Difficulty</p>
+        <strong>Level <%= @experiment.difficulty || 1 %></strong>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card border shadow-sm h-100">
+      <div class="card-body">
+        <p class="text-body-secondary small mb-1">Status</p>
+        <strong><%= @experiment.status.titleize %></strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card border shadow-sm">
+  <div class="card-header bg-white">
+    <h2 class="h5 mb-0">Experiment Setup</h2>
+  </div>
+  <div class="list-group list-group-flush">
+    <% @experiment.experiment_phases.each do |phase| %>
+      <div class="list-group-item py-3">
+        <div class="d-flex align-items-start gap-3">
+          <span class="badge rounded-pill text-bg-primary mt-1"><%= phase.position %></span>
+          <div>
+            <h3 class="h6 mb-1"><%= phase.title %></h3>
+            <p class="text-body-secondary small mb-2"><%= phase.description %></p>
+            <ol class="mb-0 small">
+              <% phase.phase_steps.each do |step| %>
+                <li class="mb-1"><%= step.instruction %></li>
+              <% end %>
+            </ol>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>
