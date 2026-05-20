@@ -21,6 +21,6 @@ class Admin::StepActionEquipmentsController < Admin::BaseController
   end
 
   def step_action_equipment_params
-    params.require(:step_action_equipment).permit(:equipment_id, :quantity)
+    params.require(:step_action_equipment).permit(:equipment_id, :instruction, :position)
   end
 end

@@ -1,48 +1,36 @@
-<header class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+<% content_for :title, "Available Experiments" %>
+
+<header class="student-lab-head">
   <div>
-    <h1 class="h2 fw-bold text-dark">Experiments</h1>
-    <p class="text-body-secondary mb-0 mt-1 small">Manage lab experiments and their instructions.</p>
+    <h1>Available Experiments</h1>
+    <p>Start a published lab assigned by your faculty.</p>
   </div>
-  <%= link_to new_experiment_path, class: "btn btn-primary d-inline-flex align-items-center gap-2" do %>
-    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-    New Experiment
-  <% end %>
 </header>
 
-<div class="card border shadow-sm">
-  <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-    <input type="text" placeholder="Search experiments..." class="form-control form-control-sm" style="max-width: 16rem;">
-  </div>
-  <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="table-light text-uppercase small">
-        <tr>
-          <th class="px-3 py-3">Title</th>
-          <th class="px-3 py-3">Status</th>
-          <th class="px-3 py-3">Created</th>
-          <th class="px-3 py-3 text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @experiments.each do |exp| %>
-          <tr>
-            <td class="px-3 py-3 fw-medium"><%= exp.title %></td>
-            <td class="px-3 py-3 text-body-secondary"><%= exp.status %></td>
-            <td class="px-3 py-3 text-body-secondary small"><%= exp.created_at.strftime("%b %d, %Y") %></td>
-            <td class="px-3 py-3 text-end">
-              <div class="d-flex gap-2 justify-content-end">
-                <%= link_to "Edit", edit_experiment_path(exp), class: "btn btn-link btn-sm text-primary p-0" %>
-                <%= link_to "Preview", experiment_path(exp), class: "btn btn-link btn-sm text-body-secondary p-0" %>
-              </div>
-            </td>
-          </tr>
-        <% end %>
-        <% if @experiments.empty? %>
-          <tr>
-            <td colspan="4" class="px-3 py-4 text-center text-body-secondary">No experiments created yet.</td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+<div class="student-experiment-grid">
+  <% @experiments.each do |experiment| %>
+    <article class="student-experiment-card">
+      <div>
+        <span class="badge text-bg-success mb-3">Published</span>
+        <h2><%= experiment.title %></h2>
+        <p><%= truncate(experiment.description, length: 130) %></p>
+      </div>
+      <div class="student-experiment-card__meta">
+        <span><%= experiment.duration.to_i %> min</span>
+        <span>Difficulty <%= experiment.difficulty.presence || "N/A" %></span>
+        <span><%= pluralize(experiment.experiment_phases.size, "phase") %></span>
+      </div>
+      <div class="d-flex gap-2">
+        <%= link_to "Overview", experiment_path(experiment), class: "btn btn-outline-secondary flex-fill" %>
+        <%= link_to "Start Lab", lab_experiment_path(experiment), class: "btn btn-primary flex-fill" %>
+      </div>
+    </article>
+  <% end %>
+
+  <% if @experiments.empty? %>
+    <div class="admin-empty w-100">
+      <h2>No published experiments</h2>
+      <p>Your faculty has not published a lab yet.</p>
+    </div>
+  <% end %>
 </div>

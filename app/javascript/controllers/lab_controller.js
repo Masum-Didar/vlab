@@ -1,16 +1,31 @@
 import { Controller } from "@hotwired/stimulus";
-import { createLabScene } from "../three/scene";
-import { createBeaker, createChemical } from "../three/lab_objects";
-import { animate } from "../three/interactions";
 
 export default class extends Controller {
+    static targets = ["phasePanel", "phaseTab"];
+
     connect() {
-        const canvas = this.element.querySelector("canvas");
-        const { scene, camera, renderer } = createLabScene(canvas);
+        this.currentPhase = 0;
+    }
 
-        scene.add(createBeaker());
-        scene.add(createChemical(0xff3333));
+    selectPhase(event) {
+        this.showPhase(Number(event.currentTarget.dataset.phaseIndex));
+    }
 
-        animate(renderer, scene, camera);
+    nextPhase() {
+        this.showPhase(Math.min(this.currentPhase + 1, this.phasePanelTargets.length - 1));
+    }
+
+    previousPhase() {
+        this.showPhase(Math.max(this.currentPhase - 1, 0));
+    }
+
+    showPhase(index) {
+        this.currentPhase = index;
+        this.phasePanelTargets.forEach((panel) => {
+            panel.classList.toggle("is-active", Number(panel.dataset.phaseIndex) === index);
+        });
+        this.phaseTabTargets.forEach((tab) => {
+            tab.classList.toggle("is-active", Number(tab.dataset.phaseIndex) === index);
+        });
     }
 }

@@ -59,7 +59,8 @@ class Admin::StepActionsController < Admin::BaseController
       :phase_step_id,
       :action_type,
       :instruction,
-      :position
+      :position,
+      config: {}
     )
   end
 end

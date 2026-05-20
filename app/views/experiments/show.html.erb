@@ -1,2 +1,54 @@
-<h1>Experiments#show</h1>
-<p>Find me in app/views/experiments/show.html.erb</p>
+<% content_for :title, @experiment.title %>
+
+<header class="student-lab-head">
+  <div>
+    <h1><%= @experiment.title %></h1>
+    <p><%= @experiment.description %></p>
+  </div>
+  <%= link_to "Start Lab", lab_experiment_path(@experiment), class: "btn btn-primary" %>
+</header>
+
+<section class="student-overview">
+  <div class="student-overview__stats">
+    <span><strong><%= @experiment.duration.to_i %></strong> minutes</span>
+    <span><strong><%= @experiment.difficulty.presence || "N/A" %></strong> difficulty</span>
+    <span><strong><%= @experiment.experiment_phases.size %></strong> phases</span>
+  </div>
+
+</section>
+
+<% if @experiment.method_description.present? %>
+  <section class="admin-panel">
+    <div class="admin-panel__heading">
+      <div>
+        <h2>Experiment Method</h2>
+        <p>Review the full process before starting the lab.</p>
+      </div>
+    </div>
+    <div class="text-body-secondary">
+      <%= simple_format(@experiment.method_description) %>
+    </div>
+  </section>
+<% end %>
+
+<section class="admin-panel">
+  <div class="admin-panel__heading">
+    <div>
+      <h2>Lab Flow</h2>
+      <p>Follow these phases in order when the lab starts.</p>
+    </div>
+  </div>
+  <div class="admin-flow-preview">
+    <% @experiment.experiment_phases.each do |phase| %>
+      <article class="admin-flow-preview__phase">
+        <div class="admin-flow-preview__phase-head">
+          <span><%= phase.position %></span>
+          <div>
+            <h3><%= phase.title %></h3>
+            <p><%= phase.description %></p>
+          </div>
+        </div>
+      </article>
+    <% end %>
+  </div>
+</section>

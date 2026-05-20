@@ -7,8 +7,13 @@
   </div>
 
   <div class="mb-3">
-    <%= f.label :quantity %>
-    <%= f.number_field :quantity, class: "form-control", min: 0 %>
+    <%= f.label :instruction %>
+    <%= f.text_field :instruction, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :position %>
+    <%= f.number_field :position, class: "form-control", min: 1 %>
   </div>
 
   <div class="modal-footer">

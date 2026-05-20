@@ -1,243 +1,551 @@
-<div class="container" style="max-width: 48rem;">
-  <div class="card border shadow-sm">
-    <div class="card-body p-4">
-      <h2 class="h4 fw-bold mb-2"><%= @experiment.new_record? ? "Create New Experiment" : "Edit Experiment" %></h2>
-      <p class="text-body-secondary small mb-4"><%= @experiment.new_record? ? "Add details for lab experiment flow." : "Update experiment details below." %></p>
+<% action_label = @experiment.new_record? ? "Create experiment" : "Save changes" %>
+<% equipment_options = Equipment.order(:name).map { |equipment| [equipment.name, equipment.id] } %>
+<% container_options = Container.order(:name).map { |container| ["#{container.name} (#{container.container_type})", container.id] } %>
+<% chemical_options = Chemical.order(:name).map { |chemical| [chemical.name, chemical.id] } %>
+<% action_type_options = [
+  ["Instruction / Observation", "instruction"],
+  ["Match Equipment Step", "label_match"],
+  ["Label Connect With Equipment", "label_connect"],
+  ["Connect Equipment Step", "equipment_connect"],
+  ["Transfer Chemical Step", "transfer"],
+  ["Use Equipment Step", "equipment_use"],
+  ["Quiz / Input Step", "quiz_input"]
+] %>
+<% equipment_options_html = options_for_select(equipment_options) %>
+<% equipment_template_options_html = equipment_options.any? ? options_for_select(equipment_options) : tag.option("No equipment added yet", value: "", disabled: true) %>
+<% container_options_html = options_for_select(container_options) %>
+<% chemical_options_html = options_for_select(chemical_options) %>
+<% action_type_options_html = options_for_select(action_type_options) %>
 
-      <%= form_with model: [:admin, @experiment], html: { class: "d-flex flex-column gap-4" } do |f| %>
-        <div>
-          <%= f.label :title, class: "form-label small fw-medium" %>
-          <%= f.text_field :title, class: "form-control" %>
-        </div>
-        <div>
-          <%= f.label :description, class: "form-label small fw-medium" %>
-          <%= f.text_area :description, rows: 4, class: "form-control" %>
-        </div>
-        <div>
-          <%= f.label :difficulty, class: "form-label small fw-medium" %>
-          <%= f.select :difficulty, options_for_select([["Easy", 1], ["Medium", 2], ["Hard", 3]], @experiment.difficulty), { include_blank: "Select difficulty" }, class: "form-select" %>
-        </div>
-        <div>
-          <%= f.label :status, class: "form-label small fw-medium" %>
-          <%= f.select :status, Experiment.statuses.keys.map { |s| [s.capitalize, s] }, {}, class: "form-select" %>
-        </div>
-        <div>
-          <%= f.label :duration, "Average Duration (min)", class: "form-label small fw-medium" %>
-          <%= f.number_field :duration, class: "form-control" %>
-        </div>
-        <div class="form-check">
-          <%= f.check_box :published, class: "form-check-input" %>
-          <%= f.label :published, "Publish Now", class: "form-check-label" %>
+<div class="admin-builder">
+  <header class="admin-builder__header">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-2 small">
+          <li class="breadcrumb-item"><%= link_to "Experiments", admin_experiments_path %></li>
+          <li class="breadcrumb-item active" aria-current="page"><%= @experiment.new_record? ? "New" : "Edit" %></li>
+        </ol>
+      </nav>
+      <h1><%= @experiment.new_record? ? "Create Experiment" : "Edit Experiment" %></h1>
+      <p>Build the interactive student flow with match, connect, transfer, instruction, and quiz steps.</p>
+    </div>
+    <%= link_to "Cancel", @experiment.persisted? ? admin_experiment_path(@experiment) : admin_experiments_path, class: "btn btn-outline-secondary" %>
+  </header>
+
+  <% if @experiment.errors.any? %>
+    <div class="alert alert-danger">
+      <strong>Please fix <%= pluralize(@experiment.errors.count, "issue") %>.</strong>
+      <ul class="mb-0 mt-2">
+        <% @experiment.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: [:admin, @experiment], html: { class: "admin-builder__form" } do |f| %>
+    <aside class="admin-builder__rail" aria-label="Setup sections">
+      <a href="#step-types">1. Step Types</a>
+      <a href="#settings">2. Settings</a>
+      <a href="#flow">3. Flow Builder</a>
+      <a href="#publish">4. Publish</a>
+    </aside>
+
+    <div class="admin-builder__main">
+      <section id="step-types" class="admin-panel">
+        <div class="admin-panel__heading">
+          <div>
+            <h2>Interactive Step Types</h2>
+            <p>Choose one type for each student step, then configure the equipment, chemical, labels, or answer rules.</p>
+          </div>
+          <span class="admin-chip">Flow builder</span>
         </div>
 
+        <div class="admin-step-type-grid">
+          <div><strong>Match Equipment</strong><span>Students drag labels to the correct lab equipment.</span></div>
+          <div><strong>Label Connect With Equipment</strong><span>Students connect label content with the correct equipment.</span></div>
+          <div><strong>Connect Equipment</strong><span>Students join one device/object to another, like lid to chamber.</span></div>
+          <div><strong>Transfer Chemical</strong><span>Students move a selected chemical from source to target container.</span></div>
+          <div><strong>Instruction / Observation</strong><span>Students complete a guided action or record an observation.</span></div>
+          <div><strong>Quiz / Input</strong><span>Students answer a question or enter a result before moving forward.</span></div>
+        </div>
+      </section>
 
+      <section id="settings" class="admin-panel">
+        <div class="admin-panel__heading">
+          <div>
+            <h2>Experiment Settings</h2>
+            <p>Set the title, summary, full method, difficulty, duration, and internal lifecycle status.</p>
+          </div>
+        </div>
 
-        <hr>
-        <h5 class="fw-bold">Phases</h5>
+        <div class="row g-3">
+          <div class="col-12">
+            <%= f.label :title, class: "form-label fw-semibold" %>
+            <%= f.text_field :title, class: "form-control form-control-lg", placeholder: "Gel Electrophoresis Lab" %>
+          </div>
+          <div class="col-12">
+            <%= f.label :description, class: "form-label fw-semibold" %>
+            <%= f.text_area :description, rows: 4, class: "form-control", placeholder: "What students will do and learn in this experiment." %>
+          </div>
+          <div class="col-12">
+            <%= f.label :method_description, "Experiment method / full process", class: "form-label fw-semibold" %>
+            <%= f.text_area :method_description, rows: 8, class: "form-control", placeholder: "Write the complete experiment process, including preparation, procedure, observation, and result steps." %>
+          </div>
+          <div class="col-md-4">
+            <%= f.label :difficulty, class: "form-label fw-semibold" %>
+            <%= f.select :difficulty, options_for_select([["Easy", 1], ["Medium", 2], ["Hard", 3]], @experiment.difficulty), { include_blank: "Select" }, class: "form-select" %>
+          </div>
+          <div class="col-md-4">
+            <%= f.label :duration, "Estimated duration", class: "form-label fw-semibold" %>
+            <div class="input-group">
+              <%= f.number_field :duration, min: 0, class: "form-control" %>
+              <span class="input-group-text">min</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <%= f.label :status, class: "form-label fw-semibold" %>
+            <%= f.select :status, Experiment.statuses.keys.map { |status| [status.titleize, status] }, {}, class: "form-select" %>
+          </div>
+        </div>
+      </section>
 
-        <div id="phases-wrapper">
+      <section id="flow" class="admin-panel" data-admin-flow-builder>
+        <div class="admin-panel__heading">
+          <div>
+            <h2>Student Flow</h2>
+            <p>Create phases, steps, and the interaction configuration behind each step.</p>
+          </div>
+          <button type="button" class="btn btn-outline-primary btn-sm" data-add-phase>Add phase</button>
+        </div>
+
+        <div class="admin-flow" data-phases-wrapper>
           <%= f.fields_for :experiment_phases do |phase_form| %>
+            <div class="admin-phase" data-phase-card>
+              <%= phase_form.hidden_field :id if phase_form.object.persisted? %>
+              <%= phase_form.hidden_field :_destroy, value: "0", data: { destroy_field: true } %>
 
-            <div class="card p-3 mb-3 phase-card">
-
-              <div class="d-flex justify-content-between mb-2">
-                <h6 class="fw-bold">Phase</h6>
-                <button type="button" class="btn btn-sm btn-danger remove-phase">Remove</button>
+              <div class="admin-phase__top">
+                <div>
+                  <span class="admin-step-marker"><%= phase_form.object.position.presence || phase_form.index.to_i + 1 %></span>
+                  <strong>Phase</strong>
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm" data-remove-phase>Remove</button>
               </div>
 
-              <%= phase_form.text_field :title,
-                                        class: "form-control mb-2",
-                                        placeholder: "Phase Title" %>
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <%= phase_form.label :position, class: "form-label small fw-semibold" %>
+                  <%= phase_form.number_field :position, min: 1, class: "form-control", placeholder: phase_form.index.to_i + 1 %>
+                </div>
+                <div class="col-md-9">
+                  <%= phase_form.label :title, class: "form-label small fw-semibold" %>
+                  <%= phase_form.text_field :title, class: "form-control", placeholder: "Prepare an agarose gel" %>
+                </div>
+                <div class="col-12">
+                  <%= phase_form.label :description, class: "form-label small fw-semibold" %>
+                  <%= phase_form.text_area :description, rows: 2, class: "form-control", placeholder: "Short faculty-facing purpose of this phase." %>
+                </div>
+              </div>
 
-              <%= phase_form.text_area :description,
-                                       rows: 2,
-                                       class: "form-control mb-3",
-                                       placeholder: "Phase Description" %>
-
-
-              <h6>Steps</h6>
-
-              <div class="phase-steps-wrapper">
+              <div class="admin-steps" data-steps-wrapper>
+                <div class="admin-steps__header">
+                  <strong>Steps</strong>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" data-add-step>Add step</button>
+                </div>
 
                 <%= phase_form.fields_for :phase_steps do |step_form| %>
+                  <div class="admin-step" data-step-card>
+                    <%= step_form.hidden_field :id if step_form.object.persisted? %>
+                    <%= step_form.hidden_field :_destroy, value: "0", data: { destroy_field: true } %>
+                    <div class="row g-2 align-items-start">
+                      <div class="col-md-2">
+                        <%= step_form.label :step_number, "No.", class: "form-label small fw-semibold" %>
+                        <%= step_form.number_field :step_number, min: 1, class: "form-control", placeholder: step_form.index.to_i + 1 %>
+                        <%= step_form.hidden_field :position, value: step_form.object.position.presence || step_form.object.step_number %>
+                      </div>
+                      <div class="col-md-7">
+                        <%= step_form.label :instruction, class: "form-label small fw-semibold" %>
+                        <%= step_form.text_area :instruction, rows: 2, class: "form-control", placeholder: "Tell the student exactly what to do." %>
+                      </div>
+                      <div class="col-md-2">
+                        <%= step_form.label :timer_duration, "Timer", class: "form-label small fw-semibold" %>
+                        <%= step_form.number_field :timer_duration, min: 0, class: "form-control", placeholder: "sec" %>
+                      </div>
+                      <div class="col-md-1 d-flex justify-content-end pt-md-4">
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-remove-step>&times;</button>
+                      </div>
+                      <div class="col-12">
+                        <%= step_form.label :completion_criteria, class: "form-label small fw-semibold" %>
+                        <%= step_form.text_field :completion_criteria, class: "form-control", placeholder: "What confirms this step is complete?" %>
+                      </div>
+                    </div>
 
-                  <div class="step-item border rounded p-2 mb-2 bg-light">
+                    <div class="admin-interactions">
+                      <div class="admin-steps__header">
+                        <strong>Interactive step configuration</strong>
+                      </div>
 
-                    <%= step_form.number_field :step_number,
-                                               class: "form-control mb-1",
-                                               placeholder: "Step Number" %>
+                      <%= step_form.fields_for :step_actions do |action_form| %>
+                        <% config = action_form.object.config || {} %>
+                        <div class="admin-action-config" data-action-config-card>
+                          <%= action_form.hidden_field :id if action_form.object.persisted? %>
+                          <%= action_form.hidden_field :position, value: action_form.object.position.presence || 1 %>
+                          <%= action_form.hidden_field :_destroy, value: "0", data: { destroy_field: true } %>
 
-                    <%= step_form.text_area :instruction,
-                                            rows: 2,
-                                            class: "form-control mb-2",
-                                            placeholder: "Step Instruction" %>
+                          <div class="row g-2">
+                            <div class="col-md-4">
+                              <%= action_form.label :action_type, "Step type", class: "form-label small fw-semibold" %>
+                              <%= action_form.select :action_type, options_for_select(action_type_options, action_form.object.action_type.presence || "instruction"), {}, class: "form-select", data: { action_type_select: true } %>
+                            </div>
+                            <div class="col-md-8">
+                              <%= action_form.label :instruction, "Interaction instruction", class: "form-label small fw-semibold" %>
+                              <%= action_form.text_field :instruction, class: "form-control", placeholder: "Short instruction shown for this interaction" %>
+                            </div>
+                          </div>
 
-                    <button type="button"
-                            class="btn btn-sm btn-outline-danger remove-step">
-                      Remove Step
-                    </button>
+                          <div class="admin-config-panels">
+                            <div class="admin-config-panel" data-config-panel="label_match">
+                              <label class="form-label small fw-semibold">Label matches</label>
+                              <%= text_area_tag "#{action_form.object_name}[config][label_pairs]", config["label_pairs"], rows: 3, class: "form-control", placeholder: "One per line: Chamber lid = Chamber lid marker" %>
+                            </div>
 
+                            <div class="admin-config-panel" data-config-panel="label_connect">
+                              <div class="row g-2">
+                                <div class="col-md-6">
+                                  <label class="form-label small fw-semibold">Label name</label>
+                                  <%= text_field_tag "#{action_form.object_name}[config][label_name]", config["label_name"], class: "form-control", placeholder: "Label content" %>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-label small fw-semibold">Equipment</label>
+                                    <%= link_to "Add equipment", new_admin_equipment_path, class: "small", target: "_blank", rel: "noopener" %>
+                                  </div>
+                                  <%= select_tag "#{action_form.object_name}[config][equipment_id]", options_for_select(equipment_options, config["equipment_id"]), include_blank: "Select equipment", class: "form-select" %>
+                                  <% if equipment_options.empty? %>
+                                    <div class="form-text">No equipment found. Create equipment with image first, then refresh this page.</div>
+                                  <% end %>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="admin-config-panel" data-config-panel="equipment_connect">
+                              <div class="row g-2">
+                                <div class="col-md-6">
+                                  <label class="form-label small fw-semibold">Source equipment</label>
+                                  <%= select_tag "#{action_form.object_name}[config][source_equipment_id]", options_for_select(equipment_options, config["source_equipment_id"]), include_blank: "Select source", class: "form-select" %>
+                                </div>
+                                <div class="col-md-6">
+                                  <label class="form-label small fw-semibold">Target equipment</label>
+                                  <%= select_tag "#{action_form.object_name}[config][target_equipment_id]", options_for_select(equipment_options, config["target_equipment_id"]), include_blank: "Select target", class: "form-select" %>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="admin-config-panel" data-config-panel="transfer">
+                              <div class="row g-2">
+                                <div class="col-md-4">
+                                  <label class="form-label small fw-semibold">Chemical</label>
+                                  <%= select_tag "#{action_form.object_name}[config][chemical_id]", options_for_select(chemical_options, config["chemical_id"]), include_blank: "Select chemical", class: "form-select" %>
+                                </div>
+                                <div class="col-md-4">
+                                  <label class="form-label small fw-semibold">From</label>
+                                  <%= select_tag "#{action_form.object_name}[config][source_container_id]", options_for_select(container_options, config["source_container_id"]), include_blank: "Source", class: "form-select" %>
+                                </div>
+                                <div class="col-md-4">
+                                  <label class="form-label small fw-semibold">To</label>
+                                  <%= select_tag "#{action_form.object_name}[config][target_container_id]", options_for_select(container_options, config["target_container_id"]), include_blank: "Target", class: "form-select" %>
+                                </div>
+                                <div class="col-md-4">
+                                  <label class="form-label small fw-semibold">Quantity</label>
+                                  <%= text_field_tag "#{action_form.object_name}[config][quantity]", config["quantity"], class: "form-control", placeholder: "10 uL" %>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="admin-config-panel" data-config-panel="equipment_use">
+                              <label class="form-label small fw-semibold">Required equipment</label>
+                              <%= select_tag "#{action_form.object_name}[config][equipment_id]", options_for_select(equipment_options, config["equipment_id"]), include_blank: "Select equipment", class: "form-select" %>
+                            </div>
+
+                            <div class="admin-config-panel" data-config-panel="quiz_input">
+                              <div class="row g-2">
+                                <div class="col-md-8">
+                                  <label class="form-label small fw-semibold">Question</label>
+                                  <%= text_field_tag "#{action_form.object_name}[config][question]", config["question"], class: "form-control", placeholder: "Why is ethidium bromide added?" %>
+                                </div>
+                                <div class="col-md-4">
+                                  <label class="form-label small fw-semibold">Expected answer</label>
+                                  <%= text_field_tag "#{action_form.object_name}[config][expected_answer]", config["expected_answer"], class: "form-control" %>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="admin-config-panel" data-config-panel="instruction">
+                              <label class="form-label small fw-semibold">Observation prompt</label>
+                              <%= text_field_tag "#{action_form.object_name}[config][prompt]", config["prompt"], class: "form-control", placeholder: "Optional prompt for notes or observation" %>
+                            </div>
+                          </div>
+                        </div>
+                      <% end %>
+                    </div>
                   </div>
-
                 <% end %>
-
               </div>
-
-              <button type="button"
-                      class="btn btn-sm btn-outline-primary add-step">
-                + Add Step
-              </button>
-
             </div>
-
           <% end %>
         </div>
+      </section>
 
-        <button type="button" id="add-phase" class="btn btn-outline-secondary btn-sm">
-          + Add Phase
-        </button>
+      <section id="publish" class="admin-panel">
+        <div class="admin-panel__heading">
+          <div>
+            <h2>Publish</h2>
+            <p>Keep drafts private while building. Published experiments appear for students.</p>
+          </div>
+        </div>
 
-<!--        <div id="phases-wrapper">-->
-          <%#= f.fields_for :experiment_phases do |phase_form| %>
-<!--            <div class="card p-3 mb-3 phase-item">-->
-<!--              <div class="mb-2">-->
-                <%#= phase_form.label :title %>
-                <%#= phase_form.text_field :title, class: "form-control" %>
-<!--              </div>-->
-
-<!--              <div class="mb-2">-->
-                <%#= phase_form.label :description %>
-                <%#= phase_form.text_area :description, rows: 2, class: "form-control" %>
-<!--              </div>-->
-
-<!--              <h6>Steps</h6>-->
-              <%#= phase_form.fields_for :experiment_steps do |step_form| %>
-<!--                <div class="mb-2">-->
-                  <%#= step_form.number_field :step_number, class: "form-control mb-1", placeholder: "Step No" %>
-                  <%#= step_form.text_field :instruction, class: "form-control", placeholder: "Instruction" %>
-<!--                </div>-->
-              <%# end %>
-
-<!--              <button type="button" class="btn btn-sm btn-danger remove-phase">Remove Phase</button>-->
-<!--            </div>-->
-          <%# end %>
-<!--        </div>-->
-
-<!--        <button type="button" id="add-phase" class="btn btn-outline-secondary btn-sm">-->
-<!--          + Add Phase-->
-<!--        </button>-->
-
-
-        <%= f.submit @experiment.new_record? ? "Create Experiment" : "Update Experiment", class: "btn btn-primary w-100 fw-semibold" %>
-      <% end %>
+        <div class="admin-publish">
+          <div class="form-check form-switch">
+            <%= f.check_box :published, class: "form-check-input", role: "switch" %>
+            <%= f.label :published, "Publish for students", class: "form-check-label fw-semibold" %>
+          </div>
+          <div class="d-flex flex-wrap gap-2 justify-content-end">
+            <% if @experiment.persisted? %>
+              <%= link_to "Preview student lab", lab_experiment_path(@experiment), class: "btn btn-outline-secondary", target: "_blank", rel: "noopener" %>
+            <% end %>
+            <%= f.submit action_label, class: "btn btn-primary px-4" %>
+          </div>
+        </div>
+      </section>
     </div>
-  </div>
+  <% end %>
 </div>
 
+<template data-phase-template>
+  <div class="admin-phase" data-phase-card>
+    <input type="hidden" name="experiment[experiment_phases_attributes][PHASE_INDEX][_destroy]" value="0" data-destroy-field>
+    <div class="admin-phase__top">
+      <div><span class="admin-step-marker">New</span> <strong>Phase</strong></div>
+      <button type="button" class="btn btn-outline-danger btn-sm" data-remove-phase>Remove</button>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Position</label>
+        <input type="number" min="1" name="experiment[experiment_phases_attributes][PHASE_INDEX][position]" class="form-control">
+      </div>
+      <div class="col-md-9">
+        <label class="form-label small fw-semibold">Title</label>
+        <input type="text" name="experiment[experiment_phases_attributes][PHASE_INDEX][title]" class="form-control" placeholder="Phase title">
+      </div>
+      <div class="col-12">
+        <label class="form-label small fw-semibold">Description</label>
+        <textarea rows="2" name="experiment[experiment_phases_attributes][PHASE_INDEX][description]" class="form-control"></textarea>
+      </div>
+    </div>
+    <div class="admin-steps" data-steps-wrapper>
+      <div class="admin-steps__header">
+        <strong>Steps</strong>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-add-step>Add step</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template data-step-template>
+  <div class="admin-step" data-step-card>
+    <input type="hidden" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][_destroy]" value="0" data-destroy-field>
+    <div class="row g-2 align-items-start">
+      <div class="col-md-2">
+        <label class="form-label small fw-semibold">No.</label>
+        <input type="number" min="1" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_number]" class="form-control">
+        <input type="hidden" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][position]">
+      </div>
+      <div class="col-md-7">
+        <label class="form-label small fw-semibold">Instruction</label>
+        <textarea rows="2" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][instruction]" class="form-control" placeholder="Tell the student exactly what to do."></textarea>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small fw-semibold">Timer</label>
+        <input type="number" min="0" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][timer_duration]" class="form-control" placeholder="sec">
+      </div>
+      <div class="col-md-1 d-flex justify-content-end pt-md-4">
+        <button type="button" class="btn btn-outline-danger btn-sm" data-remove-step>&times;</button>
+      </div>
+      <div class="col-12">
+        <label class="form-label small fw-semibold">Completion criteria</label>
+        <input type="text" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][completion_criteria]" class="form-control">
+      </div>
+    </div>
+    <div class="admin-interactions">
+      <div class="admin-steps__header">
+        <strong>Interactive step configuration</strong>
+      </div>
+      <div class="admin-action-config" data-action-config-card>
+        <input type="hidden" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][position]" value="1">
+        <input type="hidden" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][_destroy]" value="0" data-destroy-field>
+        <div class="row g-2">
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold">Step type</label>
+            <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][action_type]" class="form-select" data-action-type-select>
+              <%= action_type_options_html %>
+            </select>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label small fw-semibold">Interaction instruction</label>
+            <input type="text" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][instruction]" class="form-control">
+          </div>
+        </div>
+        <div class="admin-config-panels">
+          <div class="admin-config-panel" data-config-panel="label_match">
+            <label class="form-label small fw-semibold">Label matches</label>
+            <textarea rows="3" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][label_pairs]" class="form-control" placeholder="One per line: Chamber lid = Chamber lid marker"></textarea>
+          </div>
+          <div class="admin-config-panel" data-config-panel="label_connect">
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Label name</label>
+                <input type="text" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][label_name]" class="form-control" placeholder="Label content">
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center">
+                  <label class="form-label small fw-semibold">Equipment</label>
+                  <%= link_to "Add equipment", new_admin_equipment_path, class: "small", target: "_blank", rel: "noopener" %>
+                </div>
+                <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][equipment_id]" class="form-select"><option value="">Select equipment</option><%= equipment_template_options_html %></select>
+                <% if equipment_options.empty? %>
+                  <div class="form-text">No equipment found. Create equipment with image first, then refresh this page.</div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="admin-config-panel" data-config-panel="equipment_connect">
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Source equipment</label>
+                <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][source_equipment_id]" class="form-select"><option value="">Select source</option><%= equipment_options_html %></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Target equipment</label>
+                <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][target_equipment_id]" class="form-select"><option value="">Select target</option><%= equipment_options_html %></select>
+              </div>
+            </div>
+          </div>
+          <div class="admin-config-panel" data-config-panel="transfer">
+            <div class="row g-2">
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Chemical</label>
+                <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][chemical_id]" class="form-select"><option value="">Select chemical</option><%= chemical_options_html %></select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">From</label>
+                <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][source_container_id]" class="form-select"><option value="">Source</option><%= container_options_html %></select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">To</label>
+                <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][target_container_id]" class="form-select"><option value="">Target</option><%= container_options_html %></select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Quantity</label>
+                <input type="text" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][quantity]" class="form-control" placeholder="10 uL">
+              </div>
+            </div>
+          </div>
+          <div class="admin-config-panel" data-config-panel="equipment_use">
+            <label class="form-label small fw-semibold">Required equipment</label>
+            <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][equipment_id]" class="form-select"><option value="">Select equipment</option><%= equipment_options_html %></select>
+          </div>
+          <div class="admin-config-panel" data-config-panel="quiz_input">
+            <div class="row g-2">
+              <div class="col-md-8">
+                <label class="form-label small fw-semibold">Question</label>
+                <input type="text" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][question]" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Expected answer</label>
+                <input type="text" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][expected_answer]" class="form-control">
+              </div>
+            </div>
+          </div>
+          <div class="admin-config-panel" data-config-panel="instruction">
+            <label class="form-label small fw-semibold">Observation prompt</label>
+            <input type="text" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][prompt]" class="form-control">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("turbo:load", setupAdminFlowBuilder);
+  document.addEventListener("DOMContentLoaded", setupAdminFlowBuilder);
 
-        const phasesWrapper = document.getElementById("phases-wrapper");
-        const addPhaseBtn = document.getElementById("add-phase");
+  function setupAdminFlowBuilder() {
+    const builder = document.querySelector("[data-admin-flow-builder]");
+    if (!builder || builder.dataset.ready === "true") return;
+    builder.dataset.ready = "true";
 
-        let phaseIndex = phasesWrapper.children.length;
+    const phasesWrapper = builder.querySelector("[data-phases-wrapper]");
+    const phaseTemplate = document.querySelector("[data-phase-template]").innerHTML;
+    const stepTemplate = document.querySelector("[data-step-template]").innerHTML;
 
-        // ADD PHASE
-        addPhaseBtn.addEventListener("click", function () {
-
-            const phaseHTML = `
-      <div class="card p-3 mb-3 phase-card">
-
-        <div class="d-flex justify-content-between mb-2">
-          <h6 class="fw-bold">Phase</h6>
-          <button type="button" class="btn btn-sm btn-danger remove-phase">
-            Remove
-          </button>
-        </div>
-
-        <input type="text"
-        name="experiment[experiment_phases_attributes][${phaseIndex}][title]"
-        class="form-control mb-2"
-        placeholder="Phase Title">
-
-        <textarea
-        name="experiment[experiment_phases_attributes][${phaseIndex}][description]"
-        class="form-control mb-3"
-        placeholder="Phase Description"></textarea>
-
-        <h6>Steps</h6>
-
-        <div class="phase-steps-wrapper"></div>
-
-        <button type="button"
-        class="btn btn-sm btn-outline-primary add-step">
-        + Add Step
-        </button>
-
-      </div>
-    `;
-
-            phasesWrapper.insertAdjacentHTML("beforeend", phaseHTML);
-
-            phaseIndex++;
-        });
-
-
-        // DELEGATION EVENTS
-        phasesWrapper.addEventListener("click", function(e){
-
-            // REMOVE PHASE
-            if(e.target.classList.contains("remove-phase")){
-
-                e.target.closest(".phase-card").remove();
-            }
-
-
-            // ADD STEP
-            if(e.target.classList.contains("add-step")){
-
-                const phaseCard = e.target.closest(".phase-card");
-                const stepsWrapper = phaseCard.querySelector(".phase-steps-wrapper");
-
-                const phasePosition =
-                    Array.from(phasesWrapper.children).indexOf(phaseCard);
-
-                const stepIndex = stepsWrapper.children.length;
-
-                const stepHTML = `
-        <div class="step-item border rounded p-2 mb-2 bg-light">
-
-          <input type="number"
-          name="experiment[experiment_phases_attributes][${phasePosition}][phase_steps_attributes][${stepIndex}][step_number]"
-          class="form-control mb-1"
-          placeholder="Step Number">
-
-          <textarea
-          name="experiment[experiment_phases_attributes][${phasePosition}][phase_steps_attributes][${stepIndex}][instruction]"
-          class="form-control mb-2"
-          rows="2"
-          placeholder="Step Instruction"></textarea>
-
-          <button type="button"
-          class="btn btn-sm btn-outline-danger remove-step">
-          Remove Step
-          </button>
-
-        </div>
-      `;
-
-                stepsWrapper.insertAdjacentHTML("beforeend", stepHTML);
-            }
-
-
-            // REMOVE STEP
-            if(e.target.classList.contains("remove-step")){
-
-                e.target.closest(".step-item").remove();
-            }
-
-        });
-
+    builder.querySelector("[data-add-phase]").addEventListener("click", () => {
+      const phaseIndex = Date.now();
+      phasesWrapper.insertAdjacentHTML("beforeend", phaseTemplate.replaceAll("PHASE_INDEX", phaseIndex));
     });
+
+    phasesWrapper.addEventListener("click", (event) => {
+      const phaseCard = event.target.closest("[data-phase-card]");
+
+      if (event.target.matches("[data-remove-phase]") && phaseCard) {
+        markDestroyedOrRemove(phaseCard);
+      }
+
+      if (event.target.matches("[data-add-step]") && phaseCard) {
+        const stepsWrapper = phaseCard.querySelector("[data-steps-wrapper]");
+        const phaseIndex = extractPhaseIndex(phaseCard) || Date.now();
+        const stepIndex = Date.now();
+        stepsWrapper.insertAdjacentHTML("beforeend", stepTemplate.replaceAll("PHASE_INDEX", phaseIndex).replaceAll("STEP_INDEX", stepIndex));
+      }
+
+      if (event.target.matches("[data-remove-step]")) {
+        markDestroyedOrRemove(event.target.closest("[data-step-card]"));
+      }
+    });
+
+    phasesWrapper.addEventListener("change", (event) => {
+      if (event.target.matches("[data-action-type-select]")) {
+        updateActionPanels(event.target.closest("[data-action-config-card]"));
+      }
+    });
+
+    builder.querySelectorAll("[data-action-config-card]").forEach(updateActionPanels);
+  }
+
+  function markDestroyedOrRemove(element) {
+    const destroyField = element.querySelector("[data-destroy-field]");
+    const idField = element.querySelector("input[name$='[id]']");
+
+    if (destroyField && idField && idField.value) {
+      destroyField.value = "1";
+      element.classList.add("d-none");
+    } else {
+      element.remove();
+    }
+  }
+
+  function extractPhaseIndex(phaseCard) {
+    const field = phaseCard.querySelector("input[name*='[experiment_phases_attributes]'], textarea[name*='[experiment_phases_attributes]']");
+    const match = field && field.name.match(/experiment_phases_attributes\]\[([^\]]+)/);
+    return match && match[1];
+  }
+
+  function updateActionPanels(card) {
+    if (!card) return;
+    const selectedType = card.querySelector("[data-action-type-select]").value;
+    card.querySelectorAll("[data-config-panel]").forEach((panel) => {
+      panel.classList.toggle("is-active", panel.dataset.configPanel === selectedType);
+    });
+  }
 </script>

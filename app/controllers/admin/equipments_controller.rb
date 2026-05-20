@@ -44,6 +44,6 @@ class Admin::EquipmentsController < Admin::BaseController
   end
 
   def equipment_params
-    params.require(:equipment).permit(:name, :description)
+    params.require(:equipment).permit(:name, :equipment_type, :description, :image)
   end
 end

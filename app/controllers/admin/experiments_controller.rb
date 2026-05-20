@@ -2,7 +2,7 @@ class Admin::ExperimentsController < Admin::BaseController
   before_action :set_experiment, only: [:show, :edit, :update, :destroy]
 
   def index
-    @experiments = Experiment.order(created_at: :desc)
+    @experiments = Experiment.includes(experiment_phases: { phase_steps: :step_actions }).order(created_at: :desc)
   end
 
   def show
@@ -10,16 +10,9 @@ class Admin::ExperimentsController < Admin::BaseController
 
   def new
     @experiment = Experiment.new
-
-    # Build at least one phase
-    phase = @experiment.experiment_phases.build
-
-    # Build one step inside phase
-    phase.phase_steps.build
-    # phase.experiment_steps.build
-    #
-    # # Build one phase item inside phase
-    # phase.phase_items.build
+    @experiment.status = :pending
+    @experiment.published = false
+    build_default_flow
   end
 
   def create
@@ -33,13 +26,7 @@ class Admin::ExperimentsController < Admin::BaseController
   end
 
   def edit
-    # Ensure existing phases have at least one step & item for rendering
-    @experiment.experiment_phases.each do |phase|
-      phase.phase_steps.build if phase.phase_steps.empty?
-
-      # phase.experiment_steps.build if phase.experiment_steps.empty?
-      # phase.phase_items.build if phase.phase_items.empty?
-    end
+    build_default_flow
   end
 
   def update
@@ -58,13 +45,14 @@ class Admin::ExperimentsController < Admin::BaseController
   private
 
   def set_experiment
-    @experiment = Experiment.find(params[:id])
+    @experiment = Experiment.includes(experiment_phases: { phase_steps: :step_actions }).find(params[:id])
   end
 
   def experiment_params
     params.require(:experiment).permit(
       :title,
       :description,
+      :method_description,
       :difficulty,
       :status,
       :duration,
@@ -84,8 +72,19 @@ class Admin::ExperimentsController < Admin::BaseController
         phase_steps_attributes: [
           :id,
           :step_number,
+          :position,
           :instruction,
-          :_destroy
+          :timer_duration,
+          :completion_criteria,
+          :_destroy,
+          step_actions_attributes: [
+            :id,
+            :action_type,
+            :instruction,
+            :position,
+            :_destroy,
+            { config: {} }
+          ]
         ]
         # phase_items_attributes: [
         #   :id,
@@ -96,5 +95,26 @@ class Admin::ExperimentsController < Admin::BaseController
         # ]
       ]
     )
+  end
+
+  def build_default_flow
+    if @experiment.experiment_phases.empty?
+      phase = @experiment.experiment_phases.build(position: 1, title: "Phase 1")
+      step = phase.phase_steps.build(step_number: 1, position: 1)
+      step.step_actions.build(action_type: :instruction, position: 1)
+    else
+      @experiment.experiment_phases.each do |phase|
+        if phase.phase_steps.empty?
+          next_step_number = phase.phase_steps.size + 1
+          step = phase.phase_steps.build(step_number: next_step_number, position: next_step_number)
+          step.step_actions.build(action_type: :instruction, position: 1)
+          next
+        end
+
+        phase.phase_steps.each do |step|
+          step.step_actions.build(action_type: :instruction, position: 1) if step.step_actions.empty?
+        end
+      end
+    end
   end
 end

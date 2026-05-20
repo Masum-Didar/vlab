@@ -4,7 +4,7 @@
     <tr>
       <th>#</th>
       <th>Equipment</th>
-      <th>Quantity</th>
+      <th>Instruction</th>
     </tr>
     </thead>
     <tbody>
@@ -12,7 +12,7 @@
       <tr>
         <td><%= index + 1 %></td>
         <td><%= eq.equipment.name if eq.equipment.present? %></td>
-        <td><%= eq.quantity.presence || "-" %></td>
+        <td><%= eq.instruction.presence || "-" %></td>
       </tr>
     <% end %>
     </tbody>

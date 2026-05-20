@@ -1,2 +1,64 @@
-<h1>Experiments#lab</h1>
-<p>Find me in app/views/experiments/lab.html.erb</p>
+<% content_for :title, "#{@experiment.title} - Lab" %>
+
+<div class="student-lab" data-controller="lab">
+  <header class="student-lab-head">
+    <div>
+      <h1><%= @experiment.title %></h1>
+      <p>Complete each phase in order. Your faculty materials are available beside the lab workflow.</p>
+    </div>
+    <%= link_to "Exit lab", experiments_path, class: "btn btn-outline-secondary" %>
+  </header>
+
+  <div class="student-lab__workspace">
+    <section class="student-lab__stage">
+      <div class="student-lab__bench">
+        <div class="student-lab__shelf"></div>
+        <div class="student-lab__item student-lab__item--buffer">Buffer</div>
+        <div class="student-lab__item student-lab__item--chamber">Chamber</div>
+        <div class="student-lab__item student-lab__item--samples">DNA Samples</div>
+        <div class="student-lab__item student-lab__item--power">70 V</div>
+        <div class="student-lab__item student-lab__item--uv">UV Table</div>
+        <div class="student-lab__item student-lab__item--pipette">Micropipette</div>
+      </div>
+    </section>
+
+    <aside class="student-lab__panel">
+      <div class="student-lab__materials">
+        <span class="badge text-bg-light border text-dark">Interactive lab flow</span>
+      </div>
+
+      <% @experiment.experiment_phases.each_with_index do |phase, index| %>
+        <section class="student-lab__phase <%= "is-active" if index.zero? %>" data-lab-target="phasePanel" data-phase-index="<%= index %>">
+          <p>Phase <%= phase.position %></p>
+          <h2><%= phase.title %></h2>
+          <span><%= phase.description %></span>
+          <ol>
+            <% phase.phase_steps.each do |step| %>
+              <li>
+                <label>
+                  <input type="checkbox">
+                  <span>
+                    <%= step.instruction %>
+                    <% step.step_actions.each do |action| %>
+                      <small class="student-lab__action"><%= action.action_type.humanize %>: <%= student_action_hint(action) %></small>
+                    <% end %>
+                  </span>
+                </label>
+              </li>
+            <% end %>
+          </ol>
+        </section>
+      <% end %>
+
+      <div class="student-lab__nav">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-action="click->lab#previousPhase">Previous</button>
+        <div>
+          <% @experiment.experiment_phases.each_with_index do |phase, index| %>
+            <button type="button" class="student-lab__dot <%= "is-active" if index.zero? %>" data-lab-target="phaseTab" data-phase-index="<%= index %>" data-action="click->lab#selectPhase"><%= phase.position %></button>
+          <% end %>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" data-action="click->lab#nextPhase">Next</button>
+      </div>
+    </aside>
+  </div>
+</div>

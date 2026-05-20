@@ -3,13 +3,26 @@
               local: true do |f| %>
 
   <div class="mb-3">
-    <%= f.label :name %>
-    <%= f.text_field :name, class: "form-control" %>
+    <%= f.label :label_text, "Label text" %>
+    <%= f.text_field :label_text, class: "form-control" %>
   </div>
 
   <div class="mb-3">
-    <%= f.label :correct_equipment %>
-    <%= f.text_field :correct_equipment, class: "form-control" %>
+    <%= f.label :image_url, "Reference image URL" %>
+    <%= f.text_field :image_url, class: "form-control" %>
+  </div>
+
+  <div class="row g-2">
+    <div class="col-md-6">
+      <%= f.label :position %>
+      <%= f.number_field :position, class: "form-control", min: 1 %>
+    </div>
+    <div class="col-md-6 d-flex align-items-end">
+      <div class="form-check">
+        <%= f.check_box :correct_match, class: "form-check-input" %>
+        <%= f.label :correct_match, "Correct match", class: "form-check-label" %>
+      </div>
+    </div>
   </div>
 
   <div class="modal-footer">

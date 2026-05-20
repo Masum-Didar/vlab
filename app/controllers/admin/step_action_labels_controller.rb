@@ -21,6 +21,6 @@ class Admin::StepActionLabelsController < Admin::BaseController
   end
 
   def step_action_label_params
-    params.require(:step_action_label).permit(:name, :correct_equipment)
+    params.require(:step_action_label).permit(:label_text, :correct_match, :image_url, :position)
   end
 end

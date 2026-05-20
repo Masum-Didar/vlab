@@ -1,354 +1,132 @@
 <% content_for :title, @experiment.title %>
 
-<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+<header class="admin-page-head">
   <div>
-    <nav aria-label="breadcrumb" class="mb-2">
-      <ol class="breadcrumb mb-0 small text-body-secondary">
-        <li class="breadcrumb-item"><%= link_to "Admin", admin_dashboard_path %></li>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
         <li class="breadcrumb-item"><%= link_to "Experiments", admin_experiments_path %></li>
-        <li class="breadcrumb-item active" aria-current="page"><%= truncate(@experiment.title, length: 40) %></li>
+        <li class="breadcrumb-item active" aria-current="page"><%= truncate(@experiment.title, length: 42) %></li>
       </ol>
     </nav>
-    <h1 class="h2 fw-bold text-dark mb-2"><%= @experiment.title %></h1>
-    <div class="d-flex align-items-center gap-2 flex-wrap">
-      <span class="badge <%= case @experiment.status when 'started' then 'bg-primary' when 'completed' then 'bg-success' when 'failed' then 'bg-danger' else 'bg-secondary' end %>"><%= @experiment.status.capitalize %></span>
-      <% if @experiment.published %>
-        <span class="badge bg-info">Published</span>
-      <% else %>
-        <span class="badge bg-light text-dark border">Draft</span>
-      <% end %>
+    <h1><%= @experiment.title %></h1>
+    <p><%= @experiment.description.presence || "No description added yet." %></p>
+    <div class="d-flex gap-2 flex-wrap">
+      <span class="badge <%= experiment_status_badge_class(@experiment) %>"><%= @experiment.published? ? "Published for students" : "Draft" %></span>
+      <span class="badge text-bg-light border text-dark"><%= @experiment.duration.to_i %> min</span>
+      <span class="badge text-bg-light border text-dark">Difficulty <%= @experiment.difficulty.presence || "unset" %></span>
     </div>
   </div>
-  <div class="d-flex gap-2">
-    <%= link_to "Edit", edit_admin_experiment_path(@experiment), class: "btn btn-outline-primary" %>
-    <%= link_to "Delete", admin_experiment_path(@experiment), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this experiment?" }, class: "btn btn-outline-danger" %>
-    <%= link_to "← Back to list", admin_experiments_path, class: "btn btn-light" %>
+  <div class="d-flex gap-2 flex-wrap">
+    <%= link_to "Edit setup", edit_admin_experiment_path(@experiment), class: "btn btn-primary" %>
+    <%= link_to "Preview student lab", lab_experiment_path(@experiment), class: "btn btn-outline-secondary", target: "_blank", rel: "noopener" %>
+    <%= link_to "Delete", admin_experiment_path(@experiment), data: { turbo_method: :delete, turbo_confirm: "Delete this experiment?" }, class: "btn btn-outline-danger" %>
   </div>
-</div>
+</header>
 
-<div class="row g-4">
-  <div class="col-lg-8">
-    <% if @experiment.description.present? %>
-      <div class="card border shadow-sm mb-4">
-        <div class="card-header bg-white py-3 border-bottom">
-          <h2 class="h6 fw-semibold text-dark mb-0">Description</h2>
+<div class="admin-detail-grid">
+  <main class="admin-detail-main">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <div>
+          <h2>Setup Readiness</h2>
+          <p>Use this checklist before publishing the lab for students.</p>
         </div>
-        <div class="card-body">
-          <div class="text-body"><%= simple_format(@experiment.description) %></div>
-        </div>
-      </div>
-    <% end %>
-
-    <div class="card border shadow-sm mb-4">
-      <div class="card-header bg-white py-3 border-bottom">
-        <h2 class="h6 fw-semibold mb-0">Phases</h2>
+        <span class="admin-chip"><%= experiment_ready_percentage(@experiment) %>% ready</span>
       </div>
 
-      <div class="card-body">
-
-        <div class="accordion" id="phasesAccordion">
-
-          <% @experiment.experiment_phases.each_with_index do |phase, index| %>
-
-            <div class="accordion-item">
-
-              <h2 class="accordion-header" id="heading<%= index %>">
-                <button class="accordion-button collapsed"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#collapse<%= index %>">
-
-                  <strong><%= phase.title %>. Phase</strong>
-                </button>
-              </h2>
-
-              <div id="collapse<%= index %>"
-                   class="accordion-collapse collapse"
-                   data-bs-parent="#phasesAccordion">
-
-                <div class="accordion-body">
-
-                  <% if phase.description.present? %>
-                    <p class="text-muted small"><%= phase.description %></p>
-                  <% end %>
-
-
-                  <% if phase.phase_steps.any? %>
-
-                    <h6 class="fw-semibold">Steps</h6>
-
-                    <table class="table table-sm table-striped">
-                      <thead>
-                      <tr>
-                        <th width="10%">Step</th>
-                        <th>Instruction</th>
-                        <th width="15%">Action</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-
-                      <% phase.phase_steps.each do |step| %>
-
-                        <tr>
-                          <td>
-    <span class="badge bg-secondary">
-      <%= step.step_number %>
-    </span>
-                          </td>
-
-                          <td>
-                            <%= step.instruction %>
-                          </td>
-
-                          <td class="d-flex gap-2">
-
-                            <button class="btn btn-sm btn-outline-primary"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#stepActionModal"
-                                    data-step-id="<%= step.id %>">
-                              + Step Action
-                            </button>
-
-                            <button class="btn btn-sm btn-outline-secondary"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#actions_<%= step.id %>">
-                              View
-                            </button>
-
-                          </td>
-                        </tr>
-
-                        <!-- ACTIONS -->
-                        <tr class="collapse" id="actions_<%= step.id %>">
-                          <td colspan="3">
-
-                            <% if step.step_actions.any? %>
-
-                              <table class="table table-sm table-bordered mt-2">
-
-                                <thead class="table-light">
-                                <tr>
-                                  <th width="20%">Type</th>
-                                  <th width="30%">Instruction</th>
-                                  <th>Details</th>
-                                  <th width="15%">Manage</th>
-                                </tr>
-                                </thead>
-
-                                <tbody>
-
-                                <% step.step_actions.order(:position).each do |action| %>
-
-                                  <tr>
-
-                                    <td>
-                                          <span class="badge bg-info">
-                                            <%= action.action_type.humanize %>
-                                          </span>
-                                    </td>
-
-                                    <td>
-                                      <%= action.instruction.presence || "-" %>
-                                    </td>
-
-                                    <td>
-                                      <%= render_action_details(action) %>
-                                    </td>
-                                    <td>
-                                      <%= link_to "Manage", admin_step_action_path(action), class: "btn btn-sm btn-outline-primary" %>
-                                    </td>
-
-                                  </tr>
-
-                                <% end %>
-
-                                </tbody>
-
-                              </table>
-
-                            <% else %>
-
-                              <p class="text-muted small mb-0">
-                                No actions added yet.
-                              </p>
-
-                            <% end %>
-
-                          </td>
-                        </tr>
-                      <% end %>
-                      </tbody>
-                    </table>
-                  <% else %>
-                    <p class="text-muted small mb-0">
-                      No steps added for this phase.
-                    </p>
-
-                  <% end %>
-                </div>
-              </div>
-            </div>
-
-          <% end %>
-        </div>
-
-
-
-        <!-- STEP ACTION MODAL -->
-
-        <div class="modal fade" id="stepActionModal">
-
-          <div class="modal-dialog">
-
-            <div class="modal-content">
-
-              <div class="modal-header">
-                <h5 class="modal-title">Add Step Action</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-
-
-              <%= form_with model: StepAction.new, url: admin_step_actions_path do |f| %>
-
-                <div class="modal-body">
-
-                  <%= f.hidden_field :phase_step_id, id: "modal_step_id" %>
-
-                  <div class="mb-3">
-
-                    <label class="form-label">Action Type</label>
-
-                    <%= f.select :action_type,
-                                 StepAction.action_types.keys.map { |k| [k.humanize, k] },
-                                 {},
-                                 class: "form-select" %>
-
-                  </div>
-
-                  <div class="mb-3">
-
-                    <label class="form-label">Instruction</label>
-
-                    <%= f.text_area :instruction, class: "form-control" %>
-
-                  </div>
-
-                  <div class="mb-3">
-
-                    <label class="form-label">Position</label>
-
-                    <%= f.number_field :position, class: "form-control", min: 1 %>
-
-                  </div>
-
-                </div>
-
-                <div class="modal-footer">
-
-                  <button class="btn btn-light" data-bs-dismiss="modal">
-                    Cancel
-                  </button>
-
-                  <button class="btn btn-primary">
-                    Save Action
-                  </button>
-
-                </div>
-
-              <% end %>
-
-            </div>
-
+      <div class="admin-readiness">
+        <% experiment_readiness_items(@experiment).each do |label, ready| %>
+          <div class="admin-readiness__item <%= "is-ready" if ready %>">
+            <span><%= ready ? "OK" : "!" %></span>
+            <strong><%= label %></strong>
           </div>
+        <% end %>
+      </div>
+    </section>
 
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <div>
+          <h2>Experiment Method</h2>
+          <p>Full process shown as faculty guidance for this experiment.</p>
         </div>
-
+        <%= link_to "Edit method", edit_admin_experiment_path(@experiment, anchor: "settings"), class: "btn btn-outline-primary btn-sm" %>
       </div>
-    </div>
 
-  </div>
-
-  <div class="col-lg-4">
-    <div class="card border shadow-sm mb-4">
-      <div class="card-header bg-white py-3 border-bottom">
-        <h2 class="h6 fw-semibold text-dark mb-0">Overview</h2>
+      <div class="text-body-secondary">
+        <%= simple_format(@experiment.method_description.presence || "No method added yet.") %>
       </div>
-      <div class="card-body">
-        <dl class="mb-0 row g-2 small">
-          <dt class="col-5 text-body-secondary">Difficulty</dt>
-          <dd class="col-7"><%= @experiment.difficulty.present? ? (@experiment.difficulty == 1 ? "Easy" : @experiment.difficulty == 2 ? "Medium" : @experiment.difficulty == 3 ? "Hard" : "Level #{@experiment.difficulty}") : "—" %></dd>
+    </section>
 
-          <dt class="col-5 text-body-secondary">Duration</dt>
-          <dd class="col-7"><%= @experiment.duration.present? && @experiment.duration > 0 ? "#{@experiment.duration} min" : "—" %></dd>
-
-          <dt class="col-5 text-body-secondary">Created</dt>
-          <dd class="col-7"><%= @experiment.created_at.strftime("%d %b %Y, %H:%M") %></dd>
-
-          <dt class="col-5 text-body-secondary">Updated</dt>
-          <dd class="col-7"><%= @experiment.updated_at.strftime("%d %b %Y, %H:%M") %></dd>
-        </dl>
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <div>
+          <h2>Student Flow</h2>
+          <p>Phases and steps students will follow in the lab screen.</p>
+        </div>
+        <%= link_to "Edit flow", edit_admin_experiment_path(@experiment, anchor: "flow"), class: "btn btn-outline-primary btn-sm" %>
       </div>
-    </div>
 
-    <div class="card border shadow-sm mb-4">
-      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h2 class="h6 fw-semibold text-dark mb-0">Chemicals</h2>
-        <span class="badge bg-light text-dark"><%= @experiment.experiment_chemicals.size %></span>
-      </div>
-      <div class="card-body p-0">
-        <% if @experiment.experiment_chemicals.any? %>
-          <ul class="list-group list-group-flush">
-            <% @experiment.experiment_chemicals.each do |ec| %>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-2">
-                <span><%= ec.chemical.name %><% if ec.chemical.formula.present? %> <code class="small"><%= ec.chemical.formula %></code><% end %></span>
-                <% if ec.quantity_default.present? %>
-                  <span class="badge bg-light text-dark"><%= ec.quantity_default %></span>
+      <div class="admin-flow-preview">
+        <% @experiment.experiment_phases.each do |phase| %>
+          <article class="admin-flow-preview__phase">
+            <div class="admin-flow-preview__phase-head">
+              <span><%= phase.position %></span>
+              <div>
+                <h3><%= phase.title %></h3>
+                <p><%= phase.description %></p>
+              </div>
+            </div>
+
+            <% if phase.phase_steps.any? %>
+              <ol>
+                <% phase.phase_steps.each do |step| %>
+                  <li>
+                    <strong>Step <%= step.step_number %></strong>
+                    <span><%= step.instruction %></span>
+                    <% if step.timer_duration.present? %>
+                      <em><%= step.timer_duration %> sec</em>
+                    <% end %>
+                    <% if step.step_actions.any? %>
+                      <div class="admin-action-preview">
+                        <% step.step_actions.each do |action| %>
+                          <span class="badge text-bg-info"><%= action.action_type.humanize %></span>
+                          <small><%= step_action_summary(action) %></small>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </li>
                 <% end %>
-              </li>
+              </ol>
+            <% else %>
+              <p class="text-body-secondary small mb-0">No steps added.</p>
             <% end %>
-          </ul>
-        <% else %>
-          <p class="text-body-secondary text-center py-3 mb-0 small">No chemicals linked.</p>
+          </article>
         <% end %>
       </div>
-    </div>
+    </section>
+  </main>
 
-    <div class="card border shadow-sm mb-4">
-      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h2 class="h6 fw-semibold text-dark mb-0">Equipment</h2>
-        <span class="badge bg-light text-dark"><%= @experiment.experiment_equipments.size %></span>
+  <aside class="admin-detail-side">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <div>
+          <h2>Interactive Steps</h2>
+          <p>Configured action types in this experiment.</p>
+        </div>
       </div>
-      <div class="card-body p-0">
-        <% if @experiment.experiment_equipments.any? %>
-          <ul class="list-group list-group-flush">
-            <% @experiment.experiment_equipments.each do |ee| %>
-              <li class="list-group-item py-2"><%= ee.equipment.name %></li>
-            <% end %>
-          </ul>
-        <% else %>
-          <p class="text-body-secondary text-center py-3 mb-0 small">No equipment linked.</p>
-        <% end %>
-      </div>
-    </div>
-
-  </div>
+      <dl class="admin-resource-list">
+        <dt>Match equipment</dt>
+        <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:label_match?) } } %></dd>
+        <dt>Connect equipment</dt>
+        <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:equipment_connect?) } } %></dd>
+        <dt>Transfer chemical</dt>
+        <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:transfer?) } } %></dd>
+        <dt>Quiz / input</dt>
+        <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:quiz_input?) } } %></dd>
+        <dt>Last updated</dt>
+        <dd><%= @experiment.updated_at.strftime("%d %b %Y") %></dd>
+      </dl>
+    </section>
+  </aside>
 </div>
-<script>
-
-    document.addEventListener("DOMContentLoaded", function(){
-
-        const modal = document.getElementById("stepActionModal");
-
-        modal.addEventListener("show.bs.modal", function(event){
-
-            const button = event.relatedTarget;
-
-            const stepId = button.getAttribute("data-step-id");
-
-            document.getElementById("modal_step_id").value = stepId;
-
-        });
-
-    });
-
-</script>
