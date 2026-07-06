@@ -50,6 +50,84 @@ Full project review — compare 5 architecture documents + 1 PDF (lab instructio
 - Rails schema/models/controllers/views — implementation analysis
 - Three.js files — 3D scene evaluation
 
+## Session 2 (July 6, 2026)
+
+### Task
+Start implementing from WORK_PLAN_DETAILED.md — Phase 1 (P0), Task 1.1: Phase State Machine.
+
+### What Was Done
+
+#### 1. Database Migration
+- **File:** `db/migrate/20260706070422_add_phase_tracking_to_lab_sessions.rb`
+- Added `current_phase` (integer, default: 1, NOT NULL) to `lab_sessions`
+- Added `completed_phases` (jsonb, default: []) to `lab_sessions`
+
+#### 2. LabSession Model
+- **File:** `app/models/lab_session.rb` (rewritten)
+- Added `complete_phase!(phase_number)` — marks a phase as done, advances to next
+- Added `phase_completed?(phase_number)` — checks if a phase is in completed list
+- Added `all_phases_completed?` — checks if all phases are done
+- Added `can_access_phase?(phase_number)` — requires previous phase to be complete
+- Validation: `current_phase` must be >= 1
+
+#### 3. ExperimentsController
+- **File:** `app/controllers/experiments_controller.rb` (rewritten)
+- Added `set_lab_session` before_action — finds or creates session for current user/experiment
+- Added `run_step` action — validates phase access, step existence, action rules
+- Added `validate_step_action` — server-side validation for:
+  - `label_match`: checks all correct labels are selected
+  - `transfer`: checks tip contamination
+  - `voltage_set`: validates exactly 70V
+  - `quiz_input`: checks answer match
+- Auto-completes phase when all steps done
+
+#### 4. lab_controller.js (Stimulus)
+- **File:** `app/javascript/controllers/lab_controller.js` (rewritten as state machine)
+- Values: `currentPhase`, `completedPhases`, `experimentId`
+- Targets: `phasePanel`, `phaseTab`, `stepCheckbox`, `phaseNavNext`
+- State machine logic: `_canAccess(phaseNumber)` checks if previous phase is completed
+- `completeStep(event)` — sends AJAX to `POST /experiments/:id/run_step`
+- `_showToast()` — inline toast notification system (error/success/warning)
+- Locked tabs show `.is-locked` class; locked panels get `.is-locked` + pointer-events: none
+
+#### 5. lab.html.erb
+- **File:** `app/views/experiments/lab.html.erb` (updated)
+- Added `data-lab-*` attributes for currentPhase, completedPhases, experimentId
+- Added `data-toast-container` for notifications
+- Added step checkboxes with `data-action="change->lab#completeStep"`
+- Phase tabs have `is-locked` state
+- Phase dot shows current phase count
+
+#### 6. CSS Additions
+- **File:** `app/assets/stylesheets/application.css`
+- Added `.student-lab__dot.is-locked` — dimmed, not-allowed cursor
+- Added `.student-lab__phase.is-locked` — dimmed, pointer-events: none
+- Added `.lab-toast-container`, `.lab-toast` — error/success/warning styles with animation
+
+#### 7. Stimulus Registration
+- Ran `bin/rails stimulus:manifest:update` to register `lab_controller` and `sidebar_controller`
+
+### Branch
+- **Created:** `feature/phase-state-machine` (from `feature/base-docs`)
+- **Pushed:** Not yet (waiting for user review)
+
+### Files Modified
+| File | Change |
+|------|--------|
+| `db/migrate/20260706070422_add_phase_tracking_to_lab_sessions.rb` | New |
+| `app/models/lab_session.rb` | Rewritten |
+| `app/controllers/experiments_controller.rb` | Rewritten (added run_step, validation) |
+| `app/javascript/controllers/lab_controller.js` | Rewritten (state machine) |
+| `app/views/experiments/lab.html.erb` | Updated (data attrs, toasts, locking) |
+| `app/assets/stylesheets/application.css` | Updated (toast, locked styles) |
+| `app/javascript/controllers/index.js` | Auto-generated (lab_controller registered) |
+
+### Next Steps (after review)
+- Task 1.2: Error Alert System (Stimulus Toast controller)
+- Task 1.3: Voltage Validation UI (arrow-key component)
+
+---
+
 ### Outputs Created (Session 1 — July 3, 2026)
 
 | File | Description |

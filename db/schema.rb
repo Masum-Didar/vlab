@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_20_001000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_06_070422) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -150,7 +150,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_001000) do
   end
 
   create_table "lab_sessions", force: :cascade do |t|
+    t.jsonb "completed_phases", default: []
     t.datetime "created_at", null: false
+    t.integer "current_phase", default: 1, null: false
     t.datetime "ended_at"
     t.bigint "experiment_id", null: false
     t.bigint "school_id"

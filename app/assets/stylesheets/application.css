@@ -745,3 +745,66 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Phase State Machine — locked phases */
+.student-lab__dot.is-locked {
+  background: #f3f6f9;
+  border-color: #dbe2ea;
+  color: #b7c4d1;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.student-lab__phase.is-locked {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Toast notifications */
+.lab-toast-container {
+  left: 50%;
+  max-width: 28rem;
+  position: fixed;
+  top: 1rem;
+  transform: translateX(-50%);
+  width: 90%;
+  z-index: 9999;
+}
+
+.lab-toast {
+  animation: labToastIn 0.3s ease-out;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding: 0.85rem 1.25rem;
+}
+
+.lab-toast--error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+.lab-toast--success {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+}
+
+.lab-toast--warning {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+}
+
+@keyframes labToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

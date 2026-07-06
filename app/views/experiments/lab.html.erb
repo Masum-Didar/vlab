@@ -1,15 +1,24 @@
 <% content_for :title, "#{@experiment.title} - Lab" %>
 
-<div class="student-lab" data-controller="lab">
+<div class="student-lab"
+     data-controller="lab"
+     data-lab-experiment-id-value="<%= @experiment.id %>"
+     data-lab-current-phase-value="<%= @lab_session.current_phase %>"
+     data-lab-completed-phases-value="<%= @lab_session.completed_phases&.to_json || '[]' %>">
   <header class="student-lab-head">
     <div>
       <h1><%= @experiment.title %></h1>
-      <p>Complete each phase in order. Your faculty materials are available beside the lab workflow.</p>
+      <p>Complete each phase in order.</p>
     </div>
-    <%= link_to "Exit lab", experiments_path, class: "btn btn-outline-secondary" %>
+    <div class="d-flex gap-2 align-items-center">
+      <span class="badge text-bg-light border text-dark">Phase <%= @lab_session.current_phase %> of <%= @experiment.experiment_phases.size %></span>
+      <%= link_to "Exit lab", experiments_path, class: "btn btn-outline-secondary btn-sm" %>
+    </div>
   </header>
 
   <div class="student-lab__workspace">
+    <div data-toast-container class="lab-toast-container"></div>
+
     <section class="student-lab__stage">
       <div class="student-lab__bench">
         <div class="student-lab__shelf"></div>
@@ -28,15 +37,23 @@
       </div>
 
       <% @experiment.experiment_phases.each_with_index do |phase, index| %>
-        <section class="student-lab__phase <%= "is-active" if index.zero? %>" data-lab-target="phasePanel" data-phase-index="<%= index %>">
+        <section class="student-lab__phase <%= "is-active" if index.zero? %>"
+                 data-lab-target="phasePanel"
+                 data-phase-index="<%= index %>">
           <p>Phase <%= phase.position %></p>
           <h2><%= phase.title %></h2>
           <span><%= phase.description %></span>
           <ol>
             <% phase.phase_steps.each do |step| %>
-              <li>
+              <li data-step-id="<%= step.id %>"
+                  data-phase-index="<%= index %>"
+                  data-step-number="<%= step.step_number %>"
+                  data-action-type="<%= step.step_actions.first&.action_type %>">
                 <label>
-                  <input type="checkbox">
+                  <input type="checkbox"
+                         data-lab-target="stepCheckbox"
+                         data-action="change->lab#completeStep"
+                         <%= "checked" if @lab_session.phase_completed?(phase.position) %>>
                   <span>
                     <%= step.instruction %>
                     <% step.step_actions.each do |action| %>
@@ -44,6 +61,7 @@
                     <% end %>
                   </span>
                 </label>
+                <%= yield :step_inputs %>
               </li>
             <% end %>
           </ol>
@@ -54,10 +72,17 @@
         <button type="button" class="btn btn-outline-secondary btn-sm" data-action="click->lab#previousPhase">Previous</button>
         <div>
           <% @experiment.experiment_phases.each_with_index do |phase, index| %>
-            <button type="button" class="student-lab__dot <%= "is-active" if index.zero? %>" data-lab-target="phaseTab" data-phase-index="<%= index %>" data-action="click->lab#selectPhase"><%= phase.position %></button>
+            <button type="button"
+                    class="student-lab__dot <%= "is-active" if index.zero? %>"
+                    data-lab-target="phaseTab"
+                    data-phase-index="<%= index %>"
+                    data-action="click->lab#selectPhase"><%= phase.position %></button>
           <% end %>
         </div>
-        <button type="button" class="btn btn-primary btn-sm" data-action="click->lab#nextPhase">Next</button>
+        <button type="button"
+                class="btn btn-primary btn-sm"
+                data-lab-target="phaseNavNext"
+                data-action="click->lab#nextPhase">Next</button>
       </div>
     </aside>
   </div>
