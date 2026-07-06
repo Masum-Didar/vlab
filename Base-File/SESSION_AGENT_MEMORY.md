@@ -122,9 +122,37 @@ Start implementing from WORK_PLAN_DETAILED.md — Phase 1 (P0), Task 1.1: Phase 
 | `app/assets/stylesheets/application.css` | Updated (toast, locked styles) |
 | `app/javascript/controllers/index.js` | Auto-generated (lab_controller registered) |
 
-### Next Steps (after review)
-- Task 1.2: Error Alert System (Stimulus Toast controller)
-- Task 1.3: Voltage Validation UI (arrow-key component)
+### Task 2: Error Alert System ✅ Completed (July 6, 2026)
+
+#### What Was Done
+1. **`app/javascript/controllers/alert_controller.js`** (NEW)
+   - Stimulus controller for global toast notifications
+   - Listens for custom DOM events: `toast:error`, `toast:success`, `toast:warning`
+   - Configurable `duration` value (default: 4000ms)
+   - Auto-removes toasts after timeout
+   - Connects/disconnects event listeners properly
+
+2. **Layout Updates** (all 3 layouts)
+   - `application.html.erb` — added `<div data-controller="alert">`
+   - `student.html.erb` — added `<div data-controller="alert">`
+   - `admin.html.erb` — added `<div data-controller="alert">`
+
+3. **`lab_controller.js` Refactored**
+   - Removed old inline `_showToast`, `_showError`, `_showSuccess` methods
+   - Replaced with single `_alert(message, type)` that dispatches custom events
+   - Removed `data-toast-container` from `lab.html.erb` (now global)
+
+4. **`index.js`** — registered `alert` controller
+
+#### How It Works
+- Any controller can dispatch: `document.dispatchEvent(new CustomEvent('toast:error', { detail: { message } }))`
+- The `alert` controller catches the event and renders a toast
+- Three types: `error` (red), `success` (green), `warning` (yellow)
+- Toast auto-disappears after 4 seconds with slide-in animation
+
+### Next Steps
+- Task 3: Voltage Validation UI (arrow-key component)
+- Task 4: Assignments + Classrooms System
 
 ---
 

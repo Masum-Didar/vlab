@@ -4,7 +4,8 @@
      data-controller="lab"
      data-lab-experiment-id-value="<%= @experiment.id %>"
      data-lab-current-phase-value="<%= @lab_session.current_phase %>"
-     data-lab-completed-phases-value="<%= @lab_session.completed_phases&.to_json || '[]' %>">
+      data-lab-completed-phases-value="<%= @lab_session.completed_phases&.to_json || '[]' %>"
+      data-lab-total-phases-value="<%= @experiment.experiment_phases.size %>">
   <header class="student-lab-head">
     <div>
       <h1><%= @experiment.title %></h1>
@@ -17,8 +18,6 @@
   </header>
 
   <div class="student-lab__workspace">
-    <div data-toast-container class="lab-toast-container"></div>
-
     <section class="student-lab__stage">
       <div class="student-lab__bench">
         <div class="student-lab__shelf"></div>
@@ -85,5 +84,44 @@
                 data-action="click->lab#nextPhase">Next</button>
       </div>
     </aside>
+
+    <section class="student-lab__completion"
+             data-lab-target="completionScreen">
+      <div class="student-lab__certificate">
+        <div class="certificate__ribbon">
+          <span>Certificate of Completion</span>
+        </div>
+        <div class="certificate__body">
+          <div class="certificate__icon">&#10003;</div>
+          <h2>Congratulations!</h2>
+          <p class="certificate__subtitle">You have successfully completed the lab experiment.</p>
+          <div class="certificate__student">
+            <span class="certificate__student-initials"><%= current_user.initials %></span>
+            <span class="certificate__student-name"><%= current_user.full_name %></span>
+          </div>
+          <div class="certificate__details">
+            <div class="certificate__row">
+              <span class="certificate__label">Experiment:</span>
+              <span class="certificate__value"><%= @experiment.title %></span>
+            </div>
+            <div class="certificate__row">
+              <span class="certificate__label">Completed:</span>
+              <span class="certificate__value"><%= Time.current.strftime("%B %d, %Y") %></span>
+            </div>
+            <div class="certificate__row">
+              <span class="certificate__label">Phases:</span>
+              <span class="certificate__value"><%= @experiment.experiment_phases.size %> of <%= @experiment.experiment_phases.size %></span>
+            </div>
+            <div class="certificate__row">
+              <span class="certificate__label">Status:</span>
+              <span class="certificate__value certificate__value--pass">PASSED</span>
+            </div>
+          </div>
+          <div class="certificate__actions">
+            <%= link_to "Back to Dashboard", experiments_path, class: "btn btn-primary" %>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </div>

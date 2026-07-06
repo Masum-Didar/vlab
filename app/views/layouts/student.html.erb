@@ -16,6 +16,7 @@
   <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
 </head>
 <body class="min-vh-100 bg-light d-flex" data-controller="sidebar">
+<div data-controller="alert" class="lab-toast-container"></div>
   <% if user_signed_in? %>
     <%= render "shared/student_sidebar" %>
     <div id="sidebar-overlay" class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 z-2 d-none" style="cursor: pointer;" data-action="click->sidebar#close" aria-hidden="true"></div>

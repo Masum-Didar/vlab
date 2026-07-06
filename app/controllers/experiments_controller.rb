@@ -41,7 +41,7 @@ class ExperimentsController < ApplicationController
     end
 
     all_steps_complete = phase.phase_steps.all? do |s|
-      s.step_actions.all? { |a| params[:completed_action_ids]&.include?(a.id.to_s) }
+      params[:completed_step_ids]&.include?(s.id.to_s)
     end
 
     if all_steps_complete

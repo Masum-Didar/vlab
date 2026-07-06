@@ -12,3 +12,6 @@ application.register("lab", LabController)
 
 import SidebarController from "./sidebar_controller"
 application.register("sidebar", SidebarController)
+
+import AlertController from "./alert_controller"
+application.register("alert", AlertController)

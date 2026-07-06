@@ -1,12 +1,12 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-    static targets = ["phasePanel", "phaseTab", "stepCheckbox", "phaseNavNext"];
+    static targets = ["phasePanel", "phaseTab", "stepCheckbox", "phaseNavNext", "completionScreen"];
     static values = {
         currentPhase: { type: Number, default: 1 },
         completedPhases: { type: Array, default: [] },
         experimentId: Number,
-        sessionId: Number
+        totalPhases: { type: Number, default: 1 }
     };
 
     connect() {
@@ -28,16 +28,19 @@ export default class extends Controller {
         if (this._canAccess(phaseNumber)) {
             this.showPhase(index);
         } else {
-            this._showError("Complete the previous phase first.");
+            this._alert("Complete the previous phase first.", "error");
         }
     }
 
     nextPhase() {
+        const allDone = (this.completedPhasesValue?.length || 0) >= this.totalPhasesValue;
+        if (allDone) return;
+
         const next = this.currentPhaseValue;
         if (this._canAccess(next + 1)) {
             this.showPhase(next);
         } else {
-            this._showError("Complete all steps in this phase first.");
+            this._alert("Complete all steps in this phase first.", "error");
         }
     }
 
@@ -91,14 +94,14 @@ export default class extends Controller {
                     step_number: parseInt(stepCard.dataset.stepNumber),
                     action_type: actionType,
                     action_data: actionData,
-                    completed_action_ids: this._completedActionIds()
+                    completed_step_ids: this._completedStepIds()
                 })
             });
 
             const data = await response.json();
 
             if (data.error) {
-                this._showError(data.error);
+                this._alert(data.error, "error");
                 checkbox.checked = false;
                 checkbox.disabled = false;
                 return;
@@ -109,10 +112,10 @@ export default class extends Controller {
             this.currentPhaseValue = data.current_phase || phaseNumber;
 
             if (data.phase_completed) {
-                this._showSuccess(`Phase ${phaseNumber} complete!`);
+                this._alert(`Phase ${phaseNumber} complete!`, "success");
             }
         } catch (error) {
-            this._showError("Failed to save step. Please try again.");
+            this._alert("Failed to save step. Please try again.", "error");
             checkbox.checked = false;
             checkbox.disabled = false;
         }
@@ -132,40 +135,26 @@ export default class extends Controller {
         return data;
     }
 
-    _completedActionIds() {
+    _completedStepIds() {
         const ids = [];
         this.stepCheckboxTargets.forEach((cb) => {
             if (cb.checked) {
-                const card = cb.closest("[data-action-id]");
-                if (card) ids.push(card.dataset.actionId);
+                const card = cb.closest("[data-step-id]");
+                if (card) ids.push(card.dataset.stepId);
             }
         });
         return ids;
     }
 
-    _showError(message) {
-        this._showToast(message, "error");
-    }
-
-    _showSuccess(message) {
-        this._showToast(message, "success");
-    }
-
-    _showToast(message, type) {
-        const container = this.element.querySelector("[data-toast-container]");
-        if (!container) return;
-
-        const toast = document.createElement("div");
-        toast.className = `lab-toast lab-toast--${type}`;
-        toast.textContent = message;
-        container.appendChild(toast);
-
-        setTimeout(() => {
-            toast.remove();
-        }, 4000);
+    _alert(message, type) {
+        document.dispatchEvent(new CustomEvent(`toast:${type}`, {
+            detail: { message }
+        }));
     }
 
     _render() {
+        const allDone = (this.completedPhasesValue?.length || 0) >= this.totalPhasesValue;
+
         this.phaseTabTargets.forEach((tab) => {
             const tabIndex = Number(tab.dataset.phaseIndex);
             const tabPhaseNumber = tabIndex + 1;
@@ -183,14 +172,18 @@ export default class extends Controller {
             const isAccessible = this._canAccess(panelPhaseNumber);
             const isCurrent = panelPhaseNumber === this.currentPhaseValue;
 
-            panel.classList.toggle("is-active", isCurrent);
+            panel.classList.toggle("is-active", isCurrent && !allDone);
             panel.classList.toggle("is-locked", !isAccessible);
         });
 
         if (this.hasPhaseNavNextTarget) {
             const isLast = this.currentPhaseValue >= this.phasePanelTargets.length;
             this.phaseNavNextTarget.textContent = isLast ? "Complete" : "Next";
-            this.phaseNavNextTarget.disabled = false;
+            this.phaseNavNextTarget.disabled = allDone || false;
+        }
+
+        if (this.hasCompletionScreenTarget) {
+            this.completionScreenTarget.classList.toggle("is-visible", allDone);
         }
     }
 }
