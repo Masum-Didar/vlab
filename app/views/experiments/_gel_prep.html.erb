@@ -1,0 +1,78 @@
+<div class="gel-prep"
+     data-controller="gel-prep"
+     data-gel-prep-completed-steps-value="[]"
+     data-gel-prep-current-step-value="0">
+  <div class="gel-prep__progress-bar">
+    <div class="gel-prep__progress-fill" data-gel-prep-target="progress">0%</div>
+  </div>
+
+  <div class="gel-prep__visual">
+    <div class="gel-prep__tray" data-gel-prep-target="tray">
+      <div class="gel-prep__tray-body">
+        <div class="gel-prep__comb" data-gel-prep-target="comb">
+          <div class="gel-prep__comb-teeth">
+            <% 5.times do %><span></span><% end %>
+          </div>
+        </div>
+        <div class="gel-prep__gel" data-gel-prep-target="gel">
+          <div class="gel-prep__gel-surface"></div>
+        </div>
+        <div class="gel-prep__wells" data-gel-prep-target="wells">
+          <% 5.times do |i| %>
+            <div class="gel-prep__well"></div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="gel-prep__steps">
+    <li class="gel-prep__step is-current" data-gel-prep-target="step" data-prep-step="0">
+      <div class="gel-prep__step-head">
+        <span class="gel-prep__step-number">1</span>
+        <span>Place casting tray on workbench</span>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="0">
+        Place tray
+      </button>
+    </li>
+    <li class="gel-prep__step" data-gel-prep-target="step" data-prep-step="1">
+      <div class="gel-prep__step-head">
+        <span class="gel-prep__step-number">2</span>
+        <span>Insert comb to create wells</span>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="1">
+        Insert comb
+      </button>
+    </li>
+    <li class="gel-prep__step" data-gel-prep-target="step" data-prep-step="2">
+      <div class="gel-prep__step-head">
+        <span class="gel-prep__step-number">3</span>
+        <span>Pour prepared agarose gel into tray</span>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="2">
+        Pour agarose
+      </button>
+    </li>
+    <li class="gel-prep__step" data-gel-prep-target="step" data-prep-step="3">
+      <div class="gel-prep__step-head">
+        <span class="gel-prep__step-number">4</span>
+        <span>Wait for gel to solidify</span>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="3">
+        Solidify
+      </button>
+    </li>
+    <li class="gel-prep__step" data-gel-prep-target="step" data-prep-step="4">
+      <div class="gel-prep__step-head">
+        <span class="gel-prep__step-number">5</span>
+        <span>Remove comb to reveal wells</span>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="4">
+        Remove comb
+      </button>
+    </li>
+  </ul>
+
+  <input type="hidden" name="gel_prep_data" data-gel-prep-target="input" data-action-input>
+</div>

@@ -2,6 +2,8 @@ class School < ApplicationRecord
   has_many :departments, dependent: :destroy
   has_many :users, dependent: :destroy
   has_many :experiment_results, dependent: :destroy
+  has_many :experiment_schools, dependent: :destroy
+  has_many :assigned_experiments, through: :experiment_schools, source: :experiment
 
   validates :name, presence: true
   validates :subdomain, presence: true, uniqueness: { case_sensitive: false },

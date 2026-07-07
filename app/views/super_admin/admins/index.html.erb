@@ -1,0 +1,57 @@
+<% content_for :title, "Administrators" %>
+
+<header class="admin-page-head">
+  <div>
+    <h1>School Administrators</h1>
+    <p>Approve or reject administrator registration requests.</p>
+  </div>
+</header>
+
+<section class="admin-table-card">
+  <% if @admins.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>School</th>
+            <th>Status</th>
+            <th>Registered</th>
+            <th class="text-end"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @admins.each do |admin| %>
+            <tr>
+              <td><strong><%= admin.full_name %></strong></td>
+              <td class="text-body-secondary"><%= admin.email %></td>
+              <td><%= admin.school&.name || "—" %></td>
+              <td>
+                <% if admin.approved? %>
+                  <span class="badge text-bg-success">Approved</span>
+                <% else %>
+                  <span class="badge text-bg-warning">Pending</span>
+                <% end %>
+              </td>
+              <td class="small text-body-secondary"><%= admin.created_at.strftime("%b %d, %Y") %></td>
+              <td class="text-end">
+                <% unless admin.approved? %>
+                  <div class="btn-group btn-group-sm">
+                    <%= button_to "Approve", approve_super_admin_admin_path(admin), class: "btn btn-success" %>
+                    <%= button_to "Reject", reject_super_admin_admin_path(admin), method: :delete, class: "btn btn-outline-danger", data: { confirm: "Remove this admin?" } %>
+                  </div>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="admin-empty">
+      <h2>No administrators</h2>
+      <p>School administrators will appear here when they register.</p>
+    </div>
+  <% end %>
+</section>

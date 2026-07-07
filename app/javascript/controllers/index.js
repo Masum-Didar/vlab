@@ -21,3 +21,7 @@ import PipetteController from "./pipette_controller"
 application.register("pipette", PipetteController)
 import GelController from "./gel_controller"
 application.register("gel", GelController)
+import GelPrepController from "./gel_prep_controller"
+application.register("gel-prep", GelPrepController)
+import GelRunController from "./gel_run_controller"
+application.register("gel-run", GelRunController)

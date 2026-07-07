@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_072931) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_082220) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -164,6 +164,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_072931) do
     t.index ["experiment_id"], name: "index_experiment_results_on_experiment_id"
     t.index ["school_id"], name: "index_experiment_results_on_school_id"
     t.index ["user_id"], name: "index_experiment_results_on_user_id"
+  end
+
+  create_table "experiment_schools", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "experiment_id", null: false
+    t.bigint "school_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["experiment_id", "school_id"], name: "index_experiment_schools_on_experiment_id_and_school_id", unique: true
+    t.index ["experiment_id"], name: "index_experiment_schools_on_experiment_id"
+    t.index ["school_id"], name: "index_experiment_schools_on_school_id"
   end
 
   create_table "experiment_steps", force: :cascade do |t|
@@ -323,6 +333,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_072931) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
+    t.boolean "is_approved", default: false
     t.string "last_name"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
@@ -332,6 +343,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_072931) do
     t.datetime "updated_at", null: false
     t.index ["department_id"], name: "index_users_on_department_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["is_approved"], name: "index_users_on_is_approved"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["school_id"], name: "index_users_on_school_id"
   end
@@ -356,6 +368,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_072931) do
   add_foreign_key "experiment_results", "experiments"
   add_foreign_key "experiment_results", "schools"
   add_foreign_key "experiment_results", "users"
+  add_foreign_key "experiment_schools", "experiments"
+  add_foreign_key "experiment_schools", "schools"
   add_foreign_key "experiment_steps", "experiment_phases"
   add_foreign_key "experiment_steps", "experiments"
   add_foreign_key "experiments", "schools"

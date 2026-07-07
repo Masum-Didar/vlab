@@ -5,8 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   # --- Tenancy & Hierarchy ---
-  acts_as_tenant :school
-  belongs_to :school
+  acts_as_tenant :school, optional: true
   belongs_to :department, optional: true # Optional in case Admin has no dept
 
   has_many :experiment_results, dependent: :destroy
@@ -14,7 +13,7 @@ class User < ApplicationRecord
   has_many :classrooms, through: :classroom_memberships
   has_many :assignments, foreign_key: :faculty_id, dependent: :nullify
 
-  enum :role, { student: 0, faculty: 1, administrator: 2 }
+  enum :role, { student: 0, faculty: 1, administrator: 2, super_admin: 3 }
 
   # Full name fallback
   def full_name
@@ -42,6 +41,17 @@ class User < ApplicationRecord
     role == 'faculty' # or self.is_faculty (if you used a boolean)
   end
   def student?
-    role == 'student' # or self.is_student (if you used a boolean)
+    role == 'student'
   end
+
+  def approved?
+    is_approved || super_admin?
+  end
+
+  def pending_approval?
+    !approved? && !super_admin?
+  end
+
+  scope :approved, -> { where(is_approved: true) }
+  scope :pending, -> { where(is_approved: false).where.not(role: :super_admin) }
 end

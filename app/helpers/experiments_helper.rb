@@ -32,6 +32,11 @@ module ExperimentsHelper
       "Set the voltage to #{target}V using the arrow keys."
     when "quiz_input"
       config["question"].presence || "Answer the question."
+    when "gel_prep"
+      substep = config["substep"].presence || "preparation"
+      "Perform gel preparation step: #{substep.humanize}."
+    when "gel_run"
+      "Start the electrophoresis run and observe band migration."
     else
       config["prompt"].presence || action.instruction
     end

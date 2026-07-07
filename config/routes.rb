@@ -31,6 +31,24 @@ Rails.application.routes.draw do
   # Handle OPTIONS requests (CORS preflight)
   match "*path", to: "application#options", via: :options
   
+  # --- Super Admin Routes (root domain only) ---
+  namespace :super_admin do
+    get "dashboard", to: "dashboard#index", as: :dashboard
+    resources :schools, only: [:index, :show] do
+      member do
+        post :toggle_experiment
+      end
+    end
+    resources :experiments, only: [:index]
+    resources :admins, only: [:index] do
+      member do
+        post :approve
+        delete :reject
+      end
+    end
+    root to: "dashboard#index"
+  end
+
   # Defines the root path route ("/")
   # The root will be handled by SchoolLandingController which checks for tenant
   # If no tenant, it redirects to main landing

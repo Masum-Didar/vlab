@@ -1,0 +1,48 @@
+<% content_for :title, "All Experiments" %>
+
+<header class="admin-page-head">
+  <div>
+    <h1>All Experiments</h1>
+    <p>View all experiments across the system. Assign them to schools from the School page.</p>
+  </div>
+</header>
+
+<section class="admin-table-card">
+  <% if @experiments.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Experiment</th>
+            <th>Phases</th>
+            <th>Published</th>
+            <th>Schools assigned</th>
+            <th class="text-end">Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @experiments.each do |experiment| %>
+            <tr>
+              <td><strong><%= experiment.title %></strong></td>
+              <td><%= experiment.experiment_phases.size %></td>
+              <td>
+                <span class="badge <%= experiment.published? ? "text-bg-success" : "text-bg-secondary" %>">
+                  <%= experiment.published? ? "Yes" : "No" %>
+                </span>
+              </td>
+              <td><%= experiment.schools.size %></td>
+              <td class="text-end text-body-secondary small">
+                <%= experiment.created_at.strftime("%b %d, %Y") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="admin-empty">
+      <h2>No experiments</h2>
+      <p>Create experiments in the admin panel.</p>
+    </div>
+  <% end %>
+</section>

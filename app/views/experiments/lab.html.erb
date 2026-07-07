@@ -27,6 +27,9 @@
         <div class="student-lab__item student-lab__item--power">70 V</div>
         <div class="student-lab__item student-lab__item--uv">UV Table</div>
         <div class="student-lab__item student-lab__item--pipette">Micropipette</div>
+        <div class="student-lab__item student-lab__item--tray">Casting Tray</div>
+        <div class="student-lab__item student-lab__item--flask">Flask</div>
+        <div class="student-lab__item student-lab__item--comb">Comb</div>
       </div>
     </section>
 
@@ -69,6 +72,10 @@
                   <%= render "pipette_eject" %>
                 <% when "gel_band_match" %>
                   <%= render "gel_band_match" %>
+                <% when "gel_prep" %>
+                  <%= render "gel_prep" %>
+                <% when "gel_run" %>
+                  <%= render "gel_run" %>
                 <% end %>
               </li>
             <% end %>

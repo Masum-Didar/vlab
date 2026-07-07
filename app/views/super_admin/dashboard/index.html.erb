@@ -1,0 +1,51 @@
+<% content_for :title, "Dashboard" %>
+
+<header class="admin-page-head">
+  <div>
+    <h1>Super Admin Dashboard</h1>
+    <p>Manage schools, experiments, and approve administrators.</p>
+  </div>
+</header>
+
+<div class="admin-summary-grid">
+  <div class="admin-summary">
+    <span>Schools</span>
+    <strong><%= @schools_count %></strong>
+  </div>
+  <div class="admin-summary">
+    <span>Experiments</span>
+    <strong><%= @experiments_count %></strong>
+  </div>
+  <div class="admin-summary">
+    <span>Total users</span>
+    <strong><%= @total_users %></strong>
+  </div>
+  <div class="admin-summary">
+    <span>Pending approvals</span>
+    <strong><%= @admins_pending + @faculty_pending %></strong>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <h2>Pending Admin Approvals</h2>
+      </div>
+      <% if @admins_pending > 0 %>
+        <p class="text-body-secondary"><%= @admins_pending %> administrator(s) waiting for approval.</p>
+        <%= link_to "Review admins", super_admin_admins_path, class: "btn btn-primary btn-sm" %>
+      <% else %>
+        <p class="text-body-secondary mb-0">No pending admin approvals.</p>
+      <% end %>
+    </section>
+  </div>
+  <div class="col-md-6">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <h2>Pending Faculty Approvals</h2>
+      </div>
+      <p class="text-body-secondary mb-0"><%= @faculty_pending %> faculty member(s) waiting for school admin approval.</p>
+    </section>
+  </div>
+</div>

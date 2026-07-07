@@ -6,6 +6,11 @@ class ExperimentsController < ApplicationController
   def index
     @experiments = Experiment.includes(experiment_phases: :phase_steps).where(published: true).order(created_at: :desc)
 
+    if current_user.school.present?
+      assigned_ids = current_user.school.experiment_schools.pluck(:experiment_id)
+      @experiments = @experiments.where(id: assigned_ids) if assigned_ids.any?
+    end
+
     if current_user.student?
       @assignments = Assignment.where(classroom: current_user.classroom_ids)
                                .includes(:experiment, :classroom)
@@ -134,6 +139,16 @@ class ExperimentsController < ApplicationController
       expected = action.config&.dig("expected_answer")
       if expected.present? && data[:answer]&.strip&.downcase != expected.strip.downcase
         return { valid: false, message: "Incorrect answer. Please try again." }
+      end
+    when "gel_prep"
+      prep_data = data[:gel_prep_data].is_a?(String) ? JSON.parse(data[:gel_prep_data]) : (data[:gel_prep_data] || {})
+      unless prep_data["all_done"] == true || prep_data["all_done"] == "true"
+        return { valid: false, message: "Complete all gel preparation steps." }
+      end
+    when "gel_run"
+      run_data = data[:gel_run_data].is_a?(String) ? JSON.parse(data[:gel_run_data]) : (data[:gel_run_data] || {})
+      unless run_data["complete"] == true || run_data["complete"] == "true"
+        return { valid: false, message: "Wait for the electrophoresis run to complete." }
       end
     end
     { valid: true }

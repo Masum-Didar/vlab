@@ -17,7 +17,25 @@
   ["Measuring Cylinder", "measuring_cylinder"],
   ["Pipette", "pipette"]
 ].each do |name, container_type|
-  container = Container.find_or_initialize_by(name: name)
-  container.container_type = container_type
-  container.save!
+  ActsAsTenant.without_tenant do
+    container = Container.find_or_initialize_by(name: name)
+    container.container_type = container_type
+    container.save!
+  end
 end
+
+# Super Admin account (bypass tenant scoping)
+ActsAsTenant.without_tenant do
+  super_admin = User.find_or_initialize_by(email: "superadmin@vlab.com")
+  super_admin.update!(
+    first_name: "Super",
+    last_name: "Admin",
+    role: :super_admin,
+    is_approved: true,
+    password: "password123",
+    password_confirmation: "password123"
+  )
+end
+puts "Super Admin created: superadmin@vlab.com / password123"
+
+load(Rails.root.join("db/seeds/gel_electrophoresis.rb"))

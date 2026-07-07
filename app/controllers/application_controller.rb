@@ -82,6 +82,12 @@ class ApplicationController < ActionController::Base
       end
     end
     
+    # Super admins operate without a tenant
+    if current_user&.super_admin?
+      set_current_tenant(nil)
+      return
+    end
+    
     # Fallback: if user is logged in, use their school
     if current_user&.school
       set_current_tenant(current_user.school)
@@ -91,9 +97,9 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource)
-    # This logic determines where they go,
-    # The 'layout' determines what it looks like when they get there.
-    if resource.administrator? || resource.faculty?
+    if resource.super_admin?
+      super_admin_dashboard_path
+    elsif resource.administrator? || resource.faculty?
       admin_dashboard_path
     else
       root_path

@@ -1,0 +1,73 @@
+<% content_for :title, @school.name %>
+
+<header class="admin-page-head">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><%= link_to "Schools", super_admin_schools_path %></li>
+        <li class="breadcrumb-item active"><%= @school.name %></li>
+      </ol>
+    </nav>
+    <h1><%= @school.name %></h1>
+    <p>Subdomain: <code><%= @school.subdomain %>.lvh.me</code></p>
+  </div>
+</header>
+
+<div class="admin-detail-grid">
+  <div class="admin-detail-main">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <div>
+          <h2>Assigned Experiments (<%= @assigned_ids.size %>)</h2>
+          <p>Toggle experiments this school can access.</p>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Experiment</th>
+              <th>Status</th>
+              <th class="text-end">Access</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @experiments.each do |experiment| %>
+              <% assigned = @assigned_ids.include?(experiment.id) %>
+              <tr>
+                <td><strong><%= experiment.title %></strong></td>
+                <td>
+                  <span class="badge <%= experiment.published? ? "text-bg-success" : "text-bg-secondary" %>">
+                    <%= experiment.published? ? "Published" : "Draft" %>
+                  </span>
+                </td>
+                <td class="text-end">
+                  <%= button_to assigned ? "Revoke" : "Allow",
+                                toggle_experiment_super_admin_school_path(@school, experiment_id: experiment.id),
+                                class: "btn btn-#{assigned ? 'danger' : 'primary'} btn-sm" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div class="admin-detail-side">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <h2>School info</h2>
+      </div>
+      <dl class="admin-resource-list mb-0">
+        <dt>Admins</dt>
+        <dd><%= @school.users.where(role: :administrator).count %></dd>
+        <dt>Faculty</dt>
+        <dd><%= @school.users.where(role: :faculty).count %></dd>
+        <dt>Students</dt>
+        <dd><%= @school.users.where(role: :student).count %></dd>
+      </dl>
+    </section>
+  </div>
+</div>

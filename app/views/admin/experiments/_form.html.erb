@@ -13,7 +13,9 @@
   ["Pipette - Eject Tip", "pipette_eject"],
   ["DNA Gel - Band Match", "gel_band_match"],
   ["Set Voltage Step", "voltage_set"],
-  ["Quiz / Input Step", "quiz_input"]
+  ["Quiz / Input Step", "quiz_input"],
+  ["Gel Prep - Casting Tray / Comb / Pour", "gel_prep"],
+  ["Gel Run - Electrophoresis Progress", "gel_run"]
 ] %>
 <% equipment_options_html = options_for_select(equipment_options) %>
 <% equipment_template_options_html = equipment_options.any? ? options_for_select(equipment_options) : tag.option("No equipment added yet", value: "", disabled: true) %>

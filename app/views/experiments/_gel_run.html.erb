@@ -1,0 +1,22 @@
+<div class="gel-run"
+     data-controller="gel-run"
+     data-gel-run-progress-value="0"
+     data-gel-run-running-value="false">
+  <div class="gel-run__controls">
+    <div class="gel-run__progress-bar">
+      <div class="gel-run__progress-fill" data-gel-run-target="progressFill"></div>
+    </div>
+    <span class="gel-run__progress-text" data-gel-run-target="progressText">0%</span>
+    <span class="gel-run__status small text-warning" data-gel-run-target="status">Ready</span>
+  </div>
+
+  <div class="gel-run__canvas-wrap">
+    <canvas class="gel-run__canvas" data-gel-run-target="canvas" width="400" height="200"></canvas>
+  </div>
+
+  <button type="button" class="btn btn-danger btn-sm gel-run__start" data-action="click->gel-run#startRun" data-gel-run-target="startBtn">
+    Start Electrophoresis (70V)
+  </button>
+
+  <input type="hidden" name="gel_run_data" data-gel-run-target="input" data-action-input>
+</div>
