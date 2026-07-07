@@ -1,0 +1,99 @@
+<% content_for :title, "#{@student.full_name} - Progress" %>
+
+<header class="admin-page-head">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><%= link_to "Student Progress", faculty_progress_index_path %></li>
+        <li class="breadcrumb-item active"><%= @student.full_name %></li>
+      </ol>
+    </nav>
+    <h1><%= @student.full_name %></h1>
+    <p><%= @student.email %></p>
+  </div>
+</header>
+
+<% if @sessions.any? %>
+  <section class="admin-panel mb-3">
+    <div class="admin-panel__heading">
+      <div>
+        <h2>Lab Sessions</h2>
+        <p>Experiments this student has started or completed.</p>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Experiment</th>
+            <th>Status</th>
+            <th>Phase</th>
+            <th>Completed phases</th>
+            <th>Started</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @sessions.each do |session| %>
+            <tr>
+              <td><strong><%= session.experiment.title %></strong></td>
+              <td>
+                <% if session.completed_phases.present? && session.completed_phases.size >= session.experiment.experiment_phases.size %>
+                  <span class="badge text-bg-success">Completed</span>
+                <% elsif session.current_phase > 1 %>
+                  <span class="badge text-bg-primary">In progress</span>
+                <% else %>
+                  <span class="badge text-bg-secondary">Started</span>
+                <% end %>
+              </td>
+              <td><%= session.current_phase %> / <%= session.experiment.experiment_phases.size %></td>
+              <td><%= session.completed_phases&.join(", ") || "—" %></td>
+              <td class="small text-body-secondary"><%= session.created_at.strftime("%b %d, %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% else %>
+  <div class="admin-empty mb-3">
+    <h2>No lab sessions</h2>
+    <p>This student has not started any experiments yet.</p>
+  </div>
+<% end %>
+
+<% if @results.any? %>
+  <section class="admin-panel">
+    <div class="admin-panel__heading">
+      <div>
+        <h2>Experiment Results</h2>
+        <p>Completed results and submissions.</p>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Experiment</th>
+            <th>Status</th>
+            <th>Submitted</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @results.each do |result| %>
+            <tr>
+              <td><strong><%= result.experiment.title %></strong></td>
+              <td>
+                <span class="badge <%= result.status == "completed" ? "text-bg-success" : "text-bg-warning" %>">
+                  <%= result.status&.titleize || "Pending" %>
+                </span>
+              </td>
+              <td class="small text-body-secondary"><%= result.created_at.strftime("%b %d, %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>

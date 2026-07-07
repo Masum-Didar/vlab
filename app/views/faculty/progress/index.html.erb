@@ -1,0 +1,72 @@
+<% content_for :title, "Student Progress" %>
+
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Faculty workspace</p>
+    <h1>Student Progress</h1>
+    <p>Monitor student lab activity and completion across all experiments.</p>
+  </div>
+</header>
+
+<div class="admin-summary-grid">
+  <div class="admin-summary">
+    <span>Total students</span>
+    <strong><%= @students.size %></strong>
+  </div>
+  <div class="admin-summary">
+    <span>Active sessions</span>
+    <strong><%= @stats.values.count { |s| s[:total_sessions] > 0 } %></strong>
+  </div>
+  <div class="admin-summary">
+    <span>Phases completed</span>
+    <strong><%= @stats.sum { |_, s| s[:phases_completed] } %></strong>
+  </div>
+  <div class="admin-summary">
+    <span>Avg progress</span>
+    <strong><%= @stats.any? ? (@stats.sum { |_, s| s[:progress_pct] } / @stats.size).round : 0 %>%</strong>
+  </div>
+</div>
+
+<section class="admin-table-card">
+  <% if @students.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Email</th>
+            <th>Sessions</th>
+            <th>Phases done</th>
+            <th>Progress</th>
+            <th class="text-end"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @students.each do |student| %>
+            <% stat = @stats[student.id] %>
+            <tr>
+              <td><strong><%= student.full_name %></strong></td>
+              <td class="text-body-secondary"><%= student.email %></td>
+              <td><%= stat[:total_sessions] %></td>
+              <td><%= stat[:phases_completed] %> / <%= stat[:phases_total] %></td>
+              <td style="min-width: 10rem;">
+                <div class="progress" style="height: 0.5rem;">
+                  <div class="progress-bar <%= stat[:progress_pct] == 100 ? 'bg-success' : 'bg-primary' %>" style="width: <%= stat[:progress_pct] %>%"></div>
+                </div>
+                <span class="small text-body-secondary"><%= stat[:progress_pct] %>%</span>
+              </td>
+              <td class="text-end">
+                <%= link_to "View", faculty_progress_path(student), class: "btn btn-outline-primary btn-sm" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="admin-empty">
+      <h2>No students yet</h2>
+      <p>Student progress will appear here once students start lab sessions.</p>
+    </div>
+  <% end %>
+</section>

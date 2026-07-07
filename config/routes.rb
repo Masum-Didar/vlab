@@ -61,6 +61,7 @@ Rails.application.routes.draw do
   # --- Faculty Routes ---
   namespace :faculty do
     resources :assignments, only: [:index, :new, :create]
+    resources :progress, only: [:index, :show]
     resources :classrooms, only: [:index, :new, :create, :show] do
       collection do
         get :download_template
