@@ -16,6 +16,8 @@ class StepAction < ApplicationRecord
     equipment_connect: 4,
     quiz_input: 5,
     label_connect: 6,
+    pipette_tip_attach: 7,
+    pipette_eject: 8,
     voltage_set: 9
   }
 

@@ -60,8 +60,13 @@
                     <% end %>
                   </span>
                 </label>
-                <% if step.step_actions.first&.action_type == "voltage_set" %>
+                <% case step.step_actions.first&.action_type
+                   when "voltage_set" %>
                   <%= render "voltage_input" %>
+                <% when "pipette_tip_attach" %>
+                  <%= render "pipette_attach" %>
+                <% when "pipette_eject" %>
+                  <%= render "pipette_eject" %>
                 <% end %>
               </li>
             <% end %>

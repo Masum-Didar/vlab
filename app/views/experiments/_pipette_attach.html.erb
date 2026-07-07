@@ -1,0 +1,11 @@
+<div class="pipette-tip mt-2 p-2 border rounded bg-light d-flex align-items-center gap-2"
+     data-controller="pipette"
+     data-pipette-mode-value="attach">
+  <button type="button"
+          class="btn btn-success btn-sm"
+          data-action="click->pipette#attach">
+    Attach tip
+  </button>
+  <span class="badge text-bg-secondary" data-pipette-target="status">No tip</span>
+  <input type="hidden" data-pipette-target="input" data-action-input="true" value="false">
+</div>

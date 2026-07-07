@@ -13,6 +13,10 @@ module StepActionsHelper
     when "transfer"
       render "admin/step_actions/transfer", action: action
 
+    when "pipette_tip_attach"
+      content_tag(:span, "Attach tip button", class: "text-muted small")
+    when "pipette_eject"
+      content_tag(:span, "Eject tip button", class: "text-muted small")
     when "voltage_set"
       target = action.config&.dig("target_voltage") || 70
       content_tag(:span, "Set to #{target}V (arrow keys)", class: "text-muted small")

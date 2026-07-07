@@ -9,6 +9,8 @@
   ["Connect Equipment Step", "equipment_connect"],
   ["Transfer Chemical Step", "transfer"],
   ["Use Equipment Step", "equipment_use"],
+  ["Pipette - Attach Tip", "pipette_tip_attach"],
+  ["Pipette - Eject Tip", "pipette_eject"],
   ["Set Voltage Step", "voltage_set"],
   ["Quiz / Input Step", "quiz_input"]
 ] %>
@@ -69,6 +71,8 @@
           <div><strong>Transfer Chemical</strong><span>Students move a selected chemical from source to target container.</span></div>
           <div><strong>Instruction / Observation</strong><span>Students complete a guided action or record an observation.</span></div>
           <div><strong>Quiz / Input</strong><span>Students answer a question or enter a result before moving forward.</span></div>
+          <div><strong>Pipette - Attach Tip</strong><span>Students click to attach a fresh tip to the micropipette.</span></div>
+          <div><strong>Pipette - Eject Tip</strong><span>Students click to eject the used pipette tip.</span></div>
           <div><strong>Set Voltage</strong><span>Students use arrow keys to set the power supply voltage.</span></div>
         </div>
       </section>
@@ -270,6 +274,12 @@
                               <%= select_tag "#{action_form.object_name}[config][equipment_id]", options_for_select(equipment_options, config["equipment_id"]), include_blank: "Select equipment", class: "form-select" %>
                             </div>
 
+                            <div class="admin-config-panel" data-config-panel="pipette_tip_attach">
+                              <p class="small text-body-secondary mb-0">Student clicks to attach a fresh tip. No additional config needed.</p>
+                            </div>
+                            <div class="admin-config-panel" data-config-panel="pipette_eject">
+                              <p class="small text-body-secondary mb-0">Student clicks to eject the used tip. No additional config needed.</p>
+                            </div>
                             <div class="admin-config-panel" data-config-panel="voltage_set">
                               <div class="row g-2">
                                 <div class="col-md-6">
@@ -469,6 +479,12 @@
           <div class="admin-config-panel" data-config-panel="equipment_use">
             <label class="form-label small fw-semibold">Required equipment</label>
             <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][equipment_id]" class="form-select"><option value="">Select equipment</option><%= equipment_options_html %></select>
+          </div>
+          <div class="admin-config-panel" data-config-panel="pipette_tip_attach">
+            <p class="small text-body-secondary mb-0">Student clicks to attach a fresh tip. No additional config needed.</p>
+          </div>
+          <div class="admin-config-panel" data-config-panel="pipette_eject">
+            <p class="small text-body-secondary mb-0">Student clicks to eject the used tip. No additional config needed.</p>
           </div>
           <div class="admin-config-panel" data-config-panel="voltage_set">
             <div class="row g-2">

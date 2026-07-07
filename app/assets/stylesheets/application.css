@@ -984,6 +984,11 @@
   }
 }
 
+/* Pipette tip */
+.pipette-tip {
+  user-select: none;
+}
+
 /* Voltage arrow-key input */
 .voltage-input {
   user-select: none;

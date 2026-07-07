@@ -17,3 +17,5 @@ import AlertController from "./alert_controller"
 application.register("alert", AlertController)
 import VoltageController from "./voltage_controller"
 application.register("voltage", VoltageController)
+import PipetteController from "./pipette_controller"
+application.register("pipette", PipetteController)

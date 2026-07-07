@@ -102,6 +102,14 @@ class ExperimentsController < ApplicationController
       if data[:tip_changed] == false
         return { valid: false, message: "Contamination warning: Change pipette tip between samples!" }
       end
+    when "pipette_tip_attach"
+      if data[:tip_attached] != "true" && data[:tip_attached] != true
+        return { valid: false, message: "Click 'Attach tip' to attach a fresh tip first." }
+      end
+    when "pipette_eject"
+      if data[:tip_ejected] != "true" && data[:tip_ejected] != true
+        return { valid: false, message: "Click 'Eject tip' to remove the used tip." }
+      end
     when "voltage_set"
       if data[:voltage].to_i != 70
         return { valid: false, message: "Voltage must be set to exactly 70V." }
