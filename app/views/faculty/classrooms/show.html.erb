@@ -1,0 +1,115 @@
+<% content_for :title, @classroom.name %>
+
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Faculty workspace</p>
+    <h1><%= @classroom.name %></h1>
+    <p><%= @classroom.description.presence || "No description" %></p>
+  </div>
+  <div class="d-flex gap-2">
+    <%= link_to "All classrooms", faculty_classrooms_path, class: "btn btn-outline-secondary" %>
+  </div>
+</header>
+
+<div class="admin-detail-grid">
+  <div class="admin-detail-main">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <div>
+          <h2>Students (<%= @classroom.students.size %>)</h2>
+        </div>
+      </div>
+
+      <% if @classroom.students.any? %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th class="text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @classroom.students.each do |student| %>
+                <tr>
+                  <td><%= student.full_name %></td>
+                  <td class="text-body-secondary"><%= student.email %></td>
+                  <td class="text-end">
+                    <%= button_to "Remove", remove_student_faculty_classroom_path(@classroom, student_id: student.id),
+                                  method: :delete,
+                                  class: "btn btn-outline-danger btn-sm",
+                                  data: { confirm: "Remove #{student.full_name} from this classroom?" } %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="admin-empty">
+          <p class="mb-0">No students in this classroom yet.</p>
+        </div>
+      <% end %>
+    </section>
+  </div>
+
+  <div class="admin-detail-side">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <h2>Add student</h2>
+      </div>
+
+      <% if @available_students.any? %>
+        <p class="small text-body-secondary mb-2">Select from existing students:</p>
+        <%= form_with url: add_student_faculty_classroom_path(@classroom), local: true, class: "d-flex gap-2 mb-3" do |f| %>
+          <%= f.select :student_id,
+                       options_from_collection_for_select(@available_students, :id, :full_name),
+                       { prompt: "Select student" },
+                       class: "form-select form-select-sm",
+                       required: true %>
+          <%= f.submit "Add", class: "btn btn-primary btn-sm" %>
+        <% end %>
+      <% end %>
+
+      <p class="small text-body-secondary mb-2">Or add by email:</p>
+      <%= form_with url: add_by_email_faculty_classroom_path(@classroom), local: true, class: "d-flex gap-2" do |f| %>
+        <%= f.email_field :email, placeholder: "student@example.com", class: "form-control form-control-sm", required: true %>
+        <%= f.submit "Add & create if needed", class: "btn btn-outline-primary btn-sm" %>
+      <% end %>
+
+      <hr class="my-3">
+
+      <div class="admin-panel__heading">
+        <h2>Bulk import</h2>
+      </div>
+      <p class="small text-body-secondary mb-2">
+        Upload a .csv or .xlsx file with student emails.
+        <%= link_to "Download template", download_template_faculty_classrooms_path, class: "text-decoration-underline" %>
+      </p>
+      <%= form_with url: import_students_faculty_classroom_path(@classroom), local: true, class: "d-flex gap-2", multipart: true do |f| %>
+        <%= f.file_field :file, accept: ".csv,.xlsx", class: "form-control form-control-sm", required: true %>
+        <%= f.submit "Import", class: "btn btn-primary btn-sm" %>
+      <% end %>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <h2>Assignments</h2>
+      </div>
+      <% if @classroom.assignments.any? %>
+        <ul class="list-unstyled mb-0">
+          <% @classroom.assignments.each do |assignment| %>
+            <li class="d-flex justify-content-between py-1">
+              <span><%= assignment.experiment.title %></span>
+              <span class="badge text-bg-<%= assignment.active? ? "success" : "secondary" %>"><%= assignment.status %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-body-secondary small mb-0">No assignments yet.</p>
+      <% end %>
+      <%= link_to "Assign experiment", new_faculty_assignment_path, class: "btn btn-outline-primary btn-sm mt-2" %>
+    </section>
+  </div>
+</div>

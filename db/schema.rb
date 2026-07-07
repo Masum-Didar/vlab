@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_070422) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_052945) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,6 +42,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_070422) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "assignments", force: :cascade do |t|
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "due_date"
+    t.bigint "experiment_id", null: false
+    t.bigint "faculty_id", null: false
+    t.bigint "school_id", null: false
+    t.integer "status"
+    t.datetime "updated_at", null: false
+    t.index ["classroom_id"], name: "index_assignments_on_classroom_id"
+    t.index ["experiment_id"], name: "index_assignments_on_experiment_id"
+    t.index ["faculty_id"], name: "index_assignments_on_faculty_id"
+    t.index ["school_id"], name: "index_assignments_on_school_id"
+  end
+
   create_table "chemicals", force: :cascade do |t|
     t.string "color_hex"
     t.datetime "created_at", null: false
@@ -51,6 +66,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_070422) do
     t.jsonb "properties"
     t.string "state"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "classroom_memberships", force: :cascade do |t|
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "school_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["classroom_id", "user_id"], name: "index_classroom_memberships_on_classroom_id_and_user_id", unique: true
+    t.index ["classroom_id"], name: "index_classroom_memberships_on_classroom_id"
+    t.index ["school_id"], name: "index_classroom_memberships_on_school_id"
+    t.index ["user_id"], name: "index_classroom_memberships_on_user_id"
+  end
+
+  create_table "classrooms", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name"
+    t.bigint "school_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id"], name: "index_classrooms_on_school_id"
   end
 
   create_table "containers", force: :cascade do |t|
@@ -290,6 +326,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_070422) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "assignments", "classrooms"
+  add_foreign_key "assignments", "experiments"
+  add_foreign_key "assignments", "schools"
+  add_foreign_key "assignments", "users", column: "faculty_id"
+  add_foreign_key "classroom_memberships", "classrooms"
+  add_foreign_key "classroom_memberships", "schools"
+  add_foreign_key "classroom_memberships", "users"
+  add_foreign_key "classrooms", "schools"
   add_foreign_key "departments", "schools"
   add_foreign_key "experiment_chemicals", "chemicals"
   add_foreign_key "experiment_chemicals", "experiments"

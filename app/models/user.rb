@@ -10,6 +10,9 @@ class User < ApplicationRecord
   belongs_to :department, optional: true # Optional in case Admin has no dept
 
   has_many :experiment_results, dependent: :destroy
+  has_many :classroom_memberships, dependent: :destroy
+  has_many :classrooms, through: :classroom_memberships
+  has_many :assignments, foreign_key: :faculty_id, dependent: :nullify
 
   enum :role, { student: 0, faculty: 1, administrator: 2 }
 

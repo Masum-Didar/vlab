@@ -5,6 +5,13 @@ class ExperimentsController < ApplicationController
 
   def index
     @experiments = Experiment.includes(experiment_phases: :phase_steps).where(published: true).order(created_at: :desc)
+
+    if current_user.student?
+      @assignments = Assignment.where(classroom: current_user.classroom_ids)
+                               .includes(:experiment, :classroom)
+                               .active
+                               .order(due_date: :asc)
+    end
   end
 
   def show

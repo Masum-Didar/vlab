@@ -1,0 +1,37 @@
+<% content_for :title, "New classroom" %>
+
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Faculty workspace</p>
+    <h1>New classroom</h1>
+    <p>Create a classroom to organize students and assign experiments.</p>
+  </div>
+</header>
+
+<%= form_with model: @classroom, url: faculty_classrooms_path, class: "admin-panel", local: true do |f| %>
+  <% if @classroom.errors.any? %>
+    <div class="alert alert-danger">
+      <p><%= pluralize(@classroom.errors.count, "error") %>:</p>
+      <ul class="mb-0">
+        <% @classroom.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :name, "Classroom name", class: "form-label fw-semibold" %>
+    <%= f.text_field :name, class: "form-control", style: "max-width: 24rem;", placeholder: "e.g., Biology 101 - Section A" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :description, "Description (optional)", class: "form-label fw-semibold" %>
+    <%= f.text_area :description, class: "form-control", style: "max-width: 36rem;", rows: 3, placeholder: "e.g., Morning batch, Mon-Wed" %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit "Create classroom", class: "btn btn-primary" %>
+    <%= link_to "Cancel", faculty_classrooms_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

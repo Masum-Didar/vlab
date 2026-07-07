@@ -1,0 +1,49 @@
+<% content_for :title, "Classrooms" %>
+
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Faculty workspace</p>
+    <h1>Classrooms</h1>
+    <p>Manage your classrooms and student memberships.</p>
+  </div>
+  <%= link_to "New classroom", new_faculty_classroom_path, class: "btn btn-primary" %>
+</header>
+
+<section class="admin-table-card">
+  <% if @classrooms.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Students</th>
+            <th>Assignments</th>
+            <th class="text-end">Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @classrooms.each do |classroom| %>
+            <tr>
+              <td><strong><%= link_to classroom.name, faculty_classroom_path(classroom), class: "text-decoration-none" %></strong></td>
+              <td class="text-body-secondary">
+                <%= truncate(classroom.description, length: 60) if classroom.description.present? %>
+              </td>
+              <td><%= classroom.students.size %></td>
+              <td><%= classroom.assignments.size %></td>
+              <td class="text-end text-body-secondary small">
+                <%= classroom.created_at.strftime("%b %d, %Y") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="admin-empty">
+      <h2>No classrooms yet</h2>
+      <p>Create a classroom to organize your students and assign experiments.</p>
+      <%= link_to "New classroom", new_faculty_classroom_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</section>

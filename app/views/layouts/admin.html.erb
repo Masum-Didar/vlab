@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= content_for?(:title) ? "Admin | #{yield(:title)}" : "Admin Panel" %></title>
+  <title><%= content_for?(:title) ? "#{current_user&.administrator? ? "Admin" : "Faculty"} | #{yield(:title)}" : (current_user&.administrator? ? "Admin Panel" : "Faculty Panel") %></title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -22,8 +22,8 @@
 <body class="min-vh-100 bg-light d-flex">
 <div data-controller="alert" class="lab-toast-container"></div>
 
-<!-- 1. The Admin Sidebar -->
-<%= render "shared/admin_sidebar" %>
+<!-- 1. The Admin / Faculty Sidebar -->
+<%= render current_user&.administrator? ? "shared/admin_sidebar" : "shared/faculty_sidebar" %>
 
 <!-- Overlay when sidebar is open (click to close) -->
 <div id="sidebar-overlay" class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 z-2 d-none" style="cursor: pointer;" data-action="click->sidebar#close" aria-hidden="true"></div>

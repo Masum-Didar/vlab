@@ -37,7 +37,7 @@ Rails.application.routes.draw do
   get "dashboard", to: "dashboard#index"
   root "school_landing#index"
 
-  # --- Admin / Faculty Routes ---
+  # --- Admin Routes ---
   namespace :admin do
     # 1. FIX: Replace 'resources :dashboard' with this:
     get 'dashboard', to: 'dashboard#index', as: :dashboard
@@ -53,6 +53,22 @@ Rails.application.routes.draw do
     resources :equipments
     # Admin root
     root to: 'dashboard#index'
+  end
+
+  # --- Faculty Routes ---
+  namespace :faculty do
+    resources :assignments, only: [:index, :new, :create]
+    resources :classrooms, only: [:index, :new, :create, :show] do
+      collection do
+        get :download_template
+      end
+      member do
+        post :add_student
+        post :add_by_email
+        post :import_students
+        delete :remove_student
+      end
+    end
   end
 
   resources :experiments do

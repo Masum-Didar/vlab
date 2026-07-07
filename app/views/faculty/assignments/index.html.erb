@@ -1,0 +1,57 @@
+<% content_for :title, "Assignments" %>
+
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Faculty workspace</p>
+    <h1>Assignments</h1>
+    <p>Assign experiments to your classrooms.</p>
+  </div>
+  <%= link_to "New assignment", new_faculty_assignment_path, class: "btn btn-primary" %>
+</header>
+
+<section class="admin-table-card">
+  <% if @assignments.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Experiment</th>
+            <th>Classroom</th>
+            <th>Due date</th>
+            <th>Status</th>
+            <th class="text-end">Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @assignments.each do |assignment| %>
+            <tr>
+              <td><strong><%= assignment.experiment.title %></strong></td>
+              <td><%= assignment.classroom.name %></td>
+              <td>
+                <% if assignment.due_date %>
+                  <%= assignment.due_date.strftime("%b %d, %Y") %>
+                <% else %>
+                  <span class="text-body-secondary">No due date</span>
+                <% end %>
+              </td>
+              <td>
+                <span class="badge <%= assignment.status == "active" ? "text-bg-success" : assignment.status == "closed" ? "text-bg-secondary" : "text-bg-warning" %>">
+                  <%= assignment.status.titleize %>
+                </span>
+              </td>
+              <td class="text-end text-body-secondary small">
+                <%= assignment.created_at.strftime("%b %d, %Y") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="admin-empty">
+      <h2>No assignments yet</h2>
+      <p>Create your first assignment to assign an experiment to a classroom.</p>
+      <%= link_to "New assignment", new_faculty_assignment_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</section>
