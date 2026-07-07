@@ -21,6 +21,8 @@ module ExperimentsHelper
     when "equipment_use"
       equipment = Equipment.find_by(id: config["equipment_id"])&.name || "the required equipment"
       "Use #{equipment}."
+    when "gel_band_match"
+      "Click on the gel to mark DNA band positions for each well."
     when "pipette_tip_attach"
       "Click to attach a fresh pipette tip."
     when "pipette_eject"

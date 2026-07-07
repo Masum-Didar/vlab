@@ -51,6 +51,9 @@ Rails.application.routes.draw do
     resources :chemicals
     resources :containers
     resources :equipments
+    resources :experiments do
+      resources :dna_band_configs, only: [:index, :create, :edit, :update, :destroy]
+    end
     # Admin root
     root to: 'dashboard#index'
   end

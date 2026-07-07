@@ -124,6 +124,10 @@
         <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:transfer?) } } %></dd>
         <dt>Pipette Tip</dt>
         <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.select { |a| a.pipette_tip_attach? || a.pipette_eject? }.size } } %></dd>
+        <dt>Gel Band Match</dt>
+        <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:gel_band_match?) } } %></dd>
+        <dt>DNA Band Config</dt>
+        <dd><%= link_to "Manage bands (#{@experiment.dna_band_configs.size})", admin_experiment_dna_band_configs_path(@experiment) %></dd>
         <dt>Set Voltage</dt>
         <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:voltage_set?) } } %></dd>
         <dt>Quiz / input</dt>

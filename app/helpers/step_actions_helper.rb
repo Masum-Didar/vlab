@@ -13,6 +13,8 @@ module StepActionsHelper
     when "transfer"
       render "admin/step_actions/transfer", action: action
 
+    when "gel_band_match"
+      content_tag(:span, "Gel band positions (click to mark)", class: "text-muted small")
     when "pipette_tip_attach"
       content_tag(:span, "Attach tip button", class: "text-muted small")
     when "pipette_eject"

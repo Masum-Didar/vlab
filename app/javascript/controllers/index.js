@@ -19,3 +19,5 @@ import VoltageController from "./voltage_controller"
 application.register("voltage", VoltageController)
 import PipetteController from "./pipette_controller"
 application.register("pipette", PipetteController)
+import GelController from "./gel_controller"
+application.register("gel", GelController)

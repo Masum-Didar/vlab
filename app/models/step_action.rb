@@ -18,7 +18,8 @@ class StepAction < ApplicationRecord
     label_connect: 6,
     pipette_tip_attach: 7,
     pipette_eject: 8,
-    voltage_set: 9
+    voltage_set: 9,
+    gel_band_match: 10
   }
 
   validates :action_type, presence: true

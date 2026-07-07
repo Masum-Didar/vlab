@@ -102,6 +102,22 @@ class ExperimentsController < ApplicationController
       if data[:tip_changed] == false
         return { valid: false, message: "Contamination warning: Change pipette tip between samples!" }
       end
+    when "gel_band_match"
+      selections = data[:band_selections].is_a?(String) ? JSON.parse(data[:band_selections]) : (data[:band_selections] || {})
+      configs = action.phase_step&.experiment_phase&.experiment&.dna_band_configs || []
+      incorrect = []
+
+      configs.each do |config|
+        well_key = (config.well_number - 1).to_s
+        user_positions = selections[well_key] || []
+        unless DnaBandConfig.matches?(user_positions, config.band_positions)
+          incorrect << config.sample_name
+        end
+      end
+
+      if incorrect.any?
+        return { valid: false, message: "Incorrect bands for: #{incorrect.join(', ')}. Check the band positions and try again." }
+      end
     when "pipette_tip_attach"
       if data[:tip_attached] != "true" && data[:tip_attached] != true
         return { valid: false, message: "Click 'Attach tip' to attach a fresh tip first." }

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_052945) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_072931) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -102,6 +102,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_052945) do
     t.bigint "school_id", null: false
     t.datetime "updated_at", null: false
     t.index ["school_id"], name: "index_departments_on_school_id"
+  end
+
+  create_table "dna_band_configs", force: :cascade do |t|
+    t.jsonb "band_positions"
+    t.string "correct_genotype"
+    t.datetime "created_at", null: false
+    t.bigint "experiment_id", null: false
+    t.string "sample_name"
+    t.datetime "updated_at", null: false
+    t.integer "well_number"
+    t.index ["experiment_id", "well_number"], name: "index_dna_band_configs_on_experiment_id_and_well_number", unique: true
+    t.index ["experiment_id"], name: "index_dna_band_configs_on_experiment_id"
   end
 
   create_table "equipment", force: :cascade do |t|
@@ -335,6 +347,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_052945) do
   add_foreign_key "classroom_memberships", "users"
   add_foreign_key "classrooms", "schools"
   add_foreign_key "departments", "schools"
+  add_foreign_key "dna_band_configs", "experiments"
   add_foreign_key "experiment_chemicals", "chemicals"
   add_foreign_key "experiment_chemicals", "experiments"
   add_foreign_key "experiment_equipments", "equipment"

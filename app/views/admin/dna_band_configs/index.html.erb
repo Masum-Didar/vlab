@@ -1,0 +1,113 @@
+<% content_for :title, "DNA Band Configs - #{@experiment.title}" %>
+
+<header class="admin-page-head">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><%= link_to "Experiments", admin_experiments_path %></li>
+        <li class="breadcrumb-item"><%= link_to @experiment.title, admin_experiment_path(@experiment) %></li>
+        <li class="breadcrumb-item active">DNA Bands</li>
+      </ol>
+    </nav>
+    <h1>DNA Band Configuration</h1>
+    <p>Define expected band positions for each well in the gel.</p>
+  </div>
+</header>
+
+<div class="admin-detail-grid">
+  <div class="admin-detail-main">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <div>
+          <h2>Wells</h2>
+          <p>Each well corresponds to a lane on the gel.</p>
+        </div>
+      </div>
+
+      <% if @configs.any? %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Well</th>
+                <th>Sample</th>
+                <th>Band positions</th>
+                <th>Genotype</th>
+                <th class="text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @configs.each do |config| %>
+                <tr>
+                  <td><strong><%= config.well_number %></strong></td>
+                  <td><%= config.sample_name %></td>
+                  <td><%= Array(config.band_positions).join(", ") %></td>
+                  <td><span class="badge text-bg-info"><%= config.correct_genotype %></span></td>
+                  <td class="text-end">
+                    <div class="btn-group btn-group-sm">
+                      <%= link_to "Edit", edit_admin_experiment_dna_band_config_path(@experiment, config), class: "btn btn-outline-primary" %>
+                      <%= button_to "Delete", admin_experiment_dna_band_config_path(@experiment, config), method: :delete, class: "btn btn-outline-danger btn-sm", data: { confirm: "Delete this config?" } %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="admin-empty">
+          <p class="mb-0">No band configs yet. Add one below.</p>
+        </div>
+      <% end %>
+    </section>
+  </div>
+
+  <div class="admin-detail-side">
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <h2>Add well</h2>
+      </div>
+
+      <%= form_with model: @config, url: admin_experiment_dna_band_configs_path(@experiment), local: true do |f| %>
+        <% if @config.errors.any? %>
+          <div class="alert alert-danger small py-2">
+            <%= @config.errors.full_messages.join(", ") %>
+          </div>
+        <% end %>
+
+        <div class="mb-2">
+          <%= f.label :well_number, class: "form-label small fw-semibold" %>
+          <%= f.number_field :well_number, min: 1, max: 12, class: "form-control form-control-sm", required: true %>
+        </div>
+
+        <div class="mb-2">
+          <%= f.label :sample_name, class: "form-label small fw-semibold" %>
+          <%= f.text_field :sample_name, class: "form-control form-control-sm", placeholder: "e.g. TNF1, DNA 1", required: true %>
+        </div>
+
+        <div class="mb-2">
+          <%= f.label :band_positions, "Band positions (comma separated)", class: "form-label small fw-semibold" %>
+          <%= f.text_field :band_positions, value: Array(f.object.band_positions).join(", "), class: "form-control form-control-sm", placeholder: "e.g. 45, 78" %>
+        </div>
+
+        <div class="mb-2">
+          <%= f.label :correct_genotype, class: "form-label small fw-semibold" %>
+          <%= f.text_field :correct_genotype, class: "form-control form-control-sm", placeholder: "e.g. Genotype-1" %>
+        </div>
+
+        <%= f.submit "Add well", class: "btn btn-primary btn-sm w-100" %>
+      <% end %>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__heading">
+        <h2>Help</h2>
+      </div>
+      <p class="small text-body-secondary mb-0">
+        Band positions are Y-coordinates on the gel image (0-300).
+        Students click on the gel to mark bands at different positions.
+        The matching algorithm compares student selections against these expected positions.
+      </p>
+    </section>
+  </div>
+</div>

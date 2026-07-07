@@ -1,0 +1,28 @@
+<div class="gel-container mt-2"
+     data-controller="gel"
+     data-gel-wells-value="5"
+     data-gel-editing-value="true">
+  <canvas data-gel-target="canvas"
+          width="400"
+          height="300"
+          class="gel-canvas border rounded w-100"
+          style="cursor: crosshair; max-width: 28rem;"
+          data-action="click->gel#clickCanvas"></canvas>
+
+  <div class="d-flex gap-2 mt-2 flex-wrap">
+    <% 5.times do |i| %>
+      <button type="button"
+              class="btn btn-outline-danger btn-sm"
+              data-action="click->gel#clearWell"
+              data-well-index="<%= i %>">
+        Clear well <%= i + 1 %>
+      </button>
+    <% end %>
+  </div>
+
+  <input type="hidden"
+         data-gel-target="input"
+         data-action-input="true"
+         name="band_selections"
+         value="{}">
+</div>
