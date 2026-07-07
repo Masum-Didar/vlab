@@ -15,7 +15,8 @@ class StepAction < ApplicationRecord
     instruction: 3,
     equipment_connect: 4,
     quiz_input: 5,
-    label_connect: 6
+    label_connect: 6,
+    voltage_set: 9
   }
 
   validates :action_type, presence: true

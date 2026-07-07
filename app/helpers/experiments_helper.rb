@@ -21,6 +21,9 @@ module ExperimentsHelper
     when "equipment_use"
       equipment = Equipment.find_by(id: config["equipment_id"])&.name || "the required equipment"
       "Use #{equipment}."
+    when "voltage_set"
+      target = config["target_voltage"].presence || "70"
+      "Set the voltage to #{target}V using the arrow keys."
     when "quiz_input"
       config["question"].presence || "Answer the question."
     else

@@ -1,0 +1,25 @@
+<div class="voltage-input d-flex align-items-center gap-2 mt-2 p-2 border rounded bg-light"
+     data-controller="voltage"
+     data-voltage-target-value="70"
+     data-voltage-min-value="0"
+     data-voltage-max-value="120"
+     data-voltage-step-value="1">
+  <button type="button"
+          class="btn btn-outline-secondary btn-sm"
+          data-action="click->voltage#down"
+          title="Decrease voltage">&larr;</button>
+
+  <span class="voltage-input__display fw-bold fs-5 px-3"
+        data-voltage-target="display">0 V</span>
+
+  <button type="button"
+          class="btn btn-outline-secondary btn-sm"
+          data-action="click->voltage#up"
+          title="Increase voltage">&rarr;</button>
+
+  <input type="hidden"
+         data-voltage-target="input"
+         data-action-input="true"
+         name="voltage"
+         value="0">
+</div>

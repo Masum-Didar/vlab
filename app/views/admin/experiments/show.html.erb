@@ -122,6 +122,8 @@
         <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:equipment_connect?) } } %></dd>
         <dt>Transfer chemical</dt>
         <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:transfer?) } } %></dd>
+        <dt>Set Voltage</dt>
+        <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:voltage_set?) } } %></dd>
         <dt>Quiz / input</dt>
         <dd><%= @experiment.experiment_phases.sum { |phase| phase.phase_steps.sum { |step| step.step_actions.count(&:quiz_input?) } } %></dd>
         <dt>Last updated</dt>

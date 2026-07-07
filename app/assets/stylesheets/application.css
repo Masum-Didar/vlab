@@ -983,3 +983,21 @@
     transform: scale(1) translateY(0);
   }
 }
+
+/* Voltage arrow-key input */
+.voltage-input {
+  user-select: none;
+}
+
+.voltage-input__display {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  min-width: 5rem;
+  text-align: center;
+}
+
+.voltage-input button {
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.25rem 0.6rem;
+}

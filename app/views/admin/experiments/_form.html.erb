@@ -9,6 +9,7 @@
   ["Connect Equipment Step", "equipment_connect"],
   ["Transfer Chemical Step", "transfer"],
   ["Use Equipment Step", "equipment_use"],
+  ["Set Voltage Step", "voltage_set"],
   ["Quiz / Input Step", "quiz_input"]
 ] %>
 <% equipment_options_html = options_for_select(equipment_options) %>
@@ -68,6 +69,7 @@
           <div><strong>Transfer Chemical</strong><span>Students move a selected chemical from source to target container.</span></div>
           <div><strong>Instruction / Observation</strong><span>Students complete a guided action or record an observation.</span></div>
           <div><strong>Quiz / Input</strong><span>Students answer a question or enter a result before moving forward.</span></div>
+          <div><strong>Set Voltage</strong><span>Students use arrow keys to set the power supply voltage.</span></div>
         </div>
       </section>
 
@@ -268,6 +270,19 @@
                               <%= select_tag "#{action_form.object_name}[config][equipment_id]", options_for_select(equipment_options, config["equipment_id"]), include_blank: "Select equipment", class: "form-select" %>
                             </div>
 
+                            <div class="admin-config-panel" data-config-panel="voltage_set">
+                              <div class="row g-2">
+                                <div class="col-md-6">
+                                  <label class="form-label small fw-semibold">Target voltage (V)</label>
+                                  <%= number_field_tag "#{action_form.object_name}[config][target_voltage]", config["target_voltage"] || 70, class: "form-control", min: 1, max: 999 %>
+                                </div>
+                                <div class="col-md-6">
+                                  <label class="form-label small fw-semibold">Max voltage (V)</label>
+                                  <%= number_field_tag "#{action_form.object_name}[config][max_voltage]", config["max_voltage"] || 120, class: "form-control", min: 1, max: 999 %>
+                                </div>
+                              </div>
+                            </div>
+
                             <div class="admin-config-panel" data-config-panel="quiz_input">
                               <div class="row g-2">
                                 <div class="col-md-8">
@@ -455,6 +470,19 @@
             <label class="form-label small fw-semibold">Required equipment</label>
             <select name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][equipment_id]" class="form-select"><option value="">Select equipment</option><%= equipment_options_html %></select>
           </div>
+          <div class="admin-config-panel" data-config-panel="voltage_set">
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Target voltage (V)</label>
+                <input type="number" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][target_voltage]" class="form-control" value="70" min="1" max="999">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Max voltage (V)</label>
+                <input type="number" name="experiment[experiment_phases_attributes][PHASE_INDEX][phase_steps_attributes][STEP_INDEX][step_actions_attributes][0][config][max_voltage]" class="form-control" value="120" min="1" max="999">
+              </div>
+            </div>
+          </div>
+
           <div class="admin-config-panel" data-config-panel="quiz_input">
             <div class="row g-2">
               <div class="col-md-8">

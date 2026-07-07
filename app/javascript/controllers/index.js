@@ -15,3 +15,5 @@ application.register("sidebar", SidebarController)
 
 import AlertController from "./alert_controller"
 application.register("alert", AlertController)
+import VoltageController from "./voltage_controller"
+application.register("voltage", VoltageController)

@@ -60,7 +60,9 @@
                     <% end %>
                   </span>
                 </label>
-                <%= yield :step_inputs %>
+                <% if step.step_actions.first&.action_type == "voltage_set" %>
+                  <%= render "voltage_input" %>
+                <% end %>
               </li>
             <% end %>
           </ol>
