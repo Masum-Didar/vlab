@@ -66,10 +66,8 @@
                 <% case step.step_actions.first&.action_type
                    when "voltage_set" %>
                   <%= render "voltage_input" %>
-                <% when "pipette_tip_attach" %>
-                  <%= render "pipette_attach" %>
-                <% when "pipette_eject" %>
-                  <%= render "pipette_eject" %>
+                <% when "pipette_tip_attach", "pipette_eject", "transfer" %>
+                  <%= render "pipette_station" %>
                 <% when "gel_band_match" %>
                   <%= render "gel_band_match" %>
                 <% when "gel_prep" %>

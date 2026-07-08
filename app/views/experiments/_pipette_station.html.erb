@@ -1,0 +1,52 @@
+<div class="pipette-station" data-controller="pipette">
+  <div class="pipette-station__visual">
+    <div class="pipette" data-pipette-target="pipetteBody">
+      <div class="pipette__shaft">
+        <div class="pipette__plunger" data-pipette-target="plunger"></div>
+        <div class="pipette__tip pipette-tip" data-pipette-target="tip" style="display: none;"></div>
+      </div>
+      <div class="pipette__label">P20 Micropipette</div>
+    </div>
+
+    <div class="autoclave-bag" data-pipette-target="autoclaveBag">
+      <div class="autoclave-bag__icon">🗑️</div>
+      <div class="autoclave-bag__label">Autoclave Bag</div>
+      <div class="autoclave-bag__count">
+        Ejected: <span data-pipette-target="ejectedTipsCount">0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pipette-station__controls">
+    <button type="button"
+            class="btn btn-success btn-sm pipette-station__btn"
+            data-action="click->pipette#attach"
+            data-pipette-disabled-when-has-tip>
+      <span class="btn-icon">+</span> Attach Fresh Tip
+    </button>
+    <button type="button"
+            class="btn btn-outline-primary btn-sm pipette-station__btn"
+            data-action="click->pipette#draw"
+            data-pipette-disabled-when-no-tip>
+      Draw
+    </button>
+    <button type="button"
+            class="btn btn-outline-primary btn-sm pipette-station__btn"
+            data-action="click->pipette#dispense"
+            data-pipette-disabled-when-no-tip>
+      Dispense
+    </button>
+    <button type="button"
+            class="btn btn-danger btn-sm pipette-station__btn"
+            data-action="click->pipette#eject"
+            data-pipette-disabled-when-no-tip>
+      Eject Tip
+    </button>
+  </div>
+
+  <div class="pipette-station__status pipette__status" data-pipette-target="statusText">
+    No tip
+  </div>
+
+  <input type="hidden" name="pipette_state" data-pipette-target="input" data-action-input="true" value="">
+</div>

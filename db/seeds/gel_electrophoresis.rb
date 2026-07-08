@@ -37,7 +37,16 @@ ActsAsTenant.without_tenant do
   [
     ["Erlenmeyer Flask", "flask"],
     ["Graduated Cylinder", "graduated_cylinder"],
-    ["Gel Tray", "tray"]
+    ["Gel Tray", "tray"],
+    ["DNA Ladder Tube", "tube"],
+    ["Sample A Tube", "tube"],
+    ["Sample B Tube", "tube"],
+    ["Sample C Tube", "tube"],
+    ["Gel Well 1", "well"],
+    ["Gel Well 2", "well"],
+    ["Gel Well 3", "well"],
+    ["Gel Well 4", "well"],
+    ["Autoclave Bag", "waste"]
   ].each do |name, ctype|
     containers[name] = Container.find_or_create_by!(name: name) { |c| c.container_type = ctype }
   end
@@ -179,9 +188,10 @@ ActsAsTenant.without_tenant do
     position: 2
   )
   step2_2.step_actions.create!(
-    action_type: :instruction,
+    action_type: :transfer,
     instruction: "Pipette DNA ladder into first well.",
-    position: 1
+    position: 1,
+    config: { "sample" => "DNA Ladder", "source" => "DNA Ladder Tube", "target" => "Gel Well 1", "well" => 1 }
   )
 
   # Step 2.3: Load Sample A
@@ -204,7 +214,7 @@ ActsAsTenant.without_tenant do
     action_type: :transfer,
     instruction: "Load Sample A into well 2.",
     position: 3,
-    config: { "tip_changed" => true }
+    config: { "sample" => "Sample A", "source" => "Sample A Tube", "target" => "Gel Well 2", "well" => 2 }
   )
 
   # Step 2.4: Load Sample B
@@ -227,7 +237,7 @@ ActsAsTenant.without_tenant do
     action_type: :transfer,
     instruction: "Load Sample B into well 3.",
     position: 3,
-    config: { "tip_changed" => true }
+    config: { "sample" => "Sample B", "source" => "Sample B Tube", "target" => "Gel Well 3", "well" => 3 }
   )
 
   # Step 2.5: Load Sample C
@@ -250,7 +260,7 @@ ActsAsTenant.without_tenant do
     action_type: :transfer,
     instruction: "Load Sample C into well 4.",
     position: 3,
-    config: { "tip_changed" => true }
+    config: { "sample" => "Sample C", "source" => "Sample C Tube", "target" => "Gel Well 4", "well" => 4 }
   )
 
   # --- Phase 3: Electrophoresis Run ---

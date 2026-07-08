@@ -45,8 +45,10 @@ class ExperimentsController < ApplicationController
       return render json: { error: "Step not found." }, status: :not_found
     end
 
-    action = step.step_actions.find_by(action_type: action_type) if action_type.present?
-    validation = validate_step_action(action, action_data) if action
+    actions = step.step_actions.order(:position)
+    actions = actions.where(action_type: action_type) if action_type.present? && actions.many? && !actions.exists?(action_type: "transfer")
+
+    validation = validate_and_process_step_actions(actions, action_data)
 
     if validation&.dig(:valid) == false
       return render json: { error: validation[:message] }, status: :unprocessable_entity
@@ -94,6 +96,24 @@ class ExperimentsController < ApplicationController
     end
   end
 
+  def validate_and_process_step_actions(actions, data)
+    result = { valid: true }
+
+    LabSession.transaction do
+      actions.each do |action|
+        validation = validate_step_action(action, data)
+        if validation[:valid] == false
+          result = validation
+          raise ActiveRecord::Rollback
+        end
+
+        process_step_action(action)
+      end
+    end
+
+    result
+  end
+
   def validate_step_action(action, data)
     case action.action_type
     when "label_match"
@@ -104,9 +124,12 @@ class ExperimentsController < ApplicationController
         return { valid: false, message: "Missing labels: #{missing.join(', ')}" }
       end
     when "transfer"
-      if data[:tip_changed] == false
-        return { valid: false, message: "Contamination warning: Change pipette tip between samples!" }
-      end
+      transfer = action.step_action_transfers.first
+      source = transfer&.source_container&.name || action.config&.dig("source") || action.config&.dig("sample") || action.instruction
+      target = transfer&.target_container&.name || action.config&.dig("target") || action.config&.dig("well") || action.instruction
+
+      validation = validate_pipette_transfer(source: source, target: target)
+      return validation if validation[:valid] == false
     when "gel_band_match"
       selections = data[:band_selections].is_a?(String) ? JSON.parse(data[:band_selections]) : (data[:band_selections] || {})
       configs = action.phase_step&.experiment_phase&.experiment&.dna_band_configs || []
@@ -124,11 +147,11 @@ class ExperimentsController < ApplicationController
         return { valid: false, message: "Incorrect bands for: #{incorrect.join(', ')}. Check the band positions and try again." }
       end
     when "pipette_tip_attach"
-      if data[:tip_attached] != "true" && data[:tip_attached] != true
-        return { valid: false, message: "Click 'Attach tip' to attach a fresh tip first." }
+      if @lab_session.pipette_status["has_tip"]
+        return { valid: false, message: "Eject the used tip before attaching a fresh one." }
       end
     when "pipette_eject"
-      if data[:tip_ejected] != "true" && data[:tip_ejected] != true
+      unless @lab_session.pipette_status["has_tip"]
         return { valid: false, message: "Click 'Eject tip' to remove the used tip." }
       end
     when "voltage_set"
@@ -152,5 +175,37 @@ class ExperimentsController < ApplicationController
       end
     end
     { valid: true }
+  end
+
+  def validate_pipette_transfer(source:, target:)
+    state = @lab_session.pipette_status
+
+    unless state["has_tip"]
+      return { valid: false, message: "Attach a fresh pipette tip before loading a sample." }
+    end
+
+    previous_source = state["last_transfer_source"]
+    reused_tip = state["last_transfer_tip_generation"].present? &&
+                 state["last_transfer_tip_generation"].to_i == state["tip_generation"].to_i
+
+    if previous_source.present? && previous_source != source && reused_tip
+      return { valid: false, message: "Contamination warning: eject the used tip and attach a fresh tip before changing samples." }
+    end
+
+    { valid: true, source: source, target: target }
+  end
+
+  def process_step_action(action)
+    case action.action_type
+    when "pipette_tip_attach"
+      @lab_session.attach_pipette_tip!
+    when "pipette_eject"
+      @lab_session.eject_pipette_tip! if @lab_session.pipette_status["has_tip"]
+    when "transfer"
+      transfer = action.step_action_transfers.first
+      source = transfer&.source_container&.name || action.config&.dig("source") || action.config&.dig("sample") || action.instruction
+      target = transfer&.target_container&.name || action.config&.dig("target") || action.config&.dig("well") || action.instruction
+      @lab_session.record_pipette_transfer!(source: source, target: target)
+    end
   end
 end

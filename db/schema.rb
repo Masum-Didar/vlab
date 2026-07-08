@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_082220) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -213,6 +213,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_082220) do
     t.integer "current_phase", default: 1, null: false
     t.datetime "ended_at"
     t.bigint "experiment_id", null: false
+    t.jsonb "pipette_state", default: {}, null: false
     t.bigint "school_id"
     t.datetime "started_at"
     t.integer "status"
