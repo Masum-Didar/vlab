@@ -4,4 +4,6 @@ class PhaseStep < ApplicationRecord
 
   accepts_nested_attributes_for :step_actions, allow_destroy: true
   validates :instruction, presence: true
+
+  has_many :master_quizzes, dependent: :destroy
 end

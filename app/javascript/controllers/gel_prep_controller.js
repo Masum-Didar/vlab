@@ -1,78 +1,122 @@
 import { Controller } from "@hotwired/stimulus";
 
-const PREP_STEPS = ["tray", "comb", "pour", "solidify", "remove_comb"];
-
 export default class extends Controller {
-    static targets = ["step", "tray", "comb", "gel", "wells", "progress", "input"];
+    static targets = [
+        "tray", "tapeLeft", "tapeRight", "comb", "gel", "wells", 
+        "actionButton", "timerDisplay", "input"
+    ];
+    
     static values = {
-        completedSteps: { type: Array, default: [] },
-        currentStep: { type: Number, default: 0 }
+        substep: String,
+        timerDuration: { type: Number, default: 600 } // Default 10 minutes in seconds
     };
 
     connect() {
-        this._render();
+        this.isTimerRunning = false;
+        this.secondsRemaining = this.timerDurationValue;
+        this._updateTimerDisplay();
     }
 
-    nextStep(event) {
-        const stepIndex = Number(event.currentTarget.dataset.prepStep);
-        if (stepIndex < 0 || stepIndex >= PREP_STEPS.length) return;
-        if (stepIndex > this.currentStepValue) return;
-
-        const completed = [...this.completedStepsValue];
-        if (!completed.includes(stepIndex)) {
-            completed.push(stepIndex);
-        }
-        this.completedStepsValue = completed;
-
-        if (stepIndex + 1 < PREP_STEPS.length) {
-            this.currentStepValue = stepIndex + 1;
-        }
-
-        this._render();
-        this._updateInput();
+    performAction(event) {
+        if (event) event.preventDefault();
+        
+        // Apply visual updates based on the substep
+        this._applyVisualChanges();
+        
+        // Mark as completed
+        this._markCompleted();
     }
 
-    _render() {
-        this.stepTargets.forEach((el, i) => {
-            const isDone = this.completedStepsValue.includes(i);
-            const isCurrent = i === this.currentStepValue;
-            const isNext = i === this.currentStepValue + 1;
+    startSolidification(event) {
+        if (event) event.preventDefault();
+        if (this.isTimerRunning) return;
 
-            el.classList.toggle("is-done", isDone);
-            el.classList.toggle("is-current", isCurrent);
-            el.classList.toggle("is-pending", !isDone && !isCurrent);
-        });
+        this.isTimerRunning = true;
+        this.actionButtonTarget.disabled = true;
+        this.actionButtonTarget.textContent = "Solidifying...";
 
-        const pct = Math.round((this.completedStepsValue.length / PREP_STEPS.length) * 100);
-        if (this.hasProgressTarget) {
-            this.progressTarget.style.width = `${pct}%`;
-            this.progressTarget.textContent = `${pct}%`;
-        }
+        // Fast-forward solidification timer: 10 minutes (600s) completes in 6 seconds (100x speed)
+        const tickRateMs = 10; // Tick every 10ms
+        const secondsPerTick = 1; // Decrement 1 second per tick
+        
+        this.timerInterval = setInterval(() => {
+            this.secondsRemaining -= secondsPerTick;
+            
+            if (this.secondsRemaining <= 0) {
+                this.secondsRemaining = 0;
+                clearInterval(this.timerInterval);
+                this.isTimerRunning = false;
+                
+                // Add solidified visual class
+                if (this.hasGelTarget) {
+                    this.gelTarget.classList.add("is-solidified");
+                }
+                
+                this.actionButtonTarget.textContent = "Gel Solidified!";
+                this._markCompleted();
+                this._flashSuccess("Gel has solidified successfully!");
+            }
+            
+            this._updateTimerDisplay();
+        }, tickRateMs);
+    }
 
-        const doneSet = new Set(this.completedStepsValue);
-
-        if (this.hasTrayTarget) {
-            this.trayTarget.classList.toggle("is-placed", doneSet.has(0));
-        }
-        if (this.hasCombTarget) {
-            this.combTarget.classList.toggle("is-inserted", doneSet.has(1));
-        }
-        if (this.hasGelTarget) {
-            this.gelTarget.classList.toggle("is-poured", doneSet.has(2));
-            this.gelTarget.classList.toggle("is-solidified", doneSet.has(3));
-        }
-        if (this.hasWellsTarget) {
-            this.wellsTarget.classList.toggle("is-visible", doneSet.has(4));
+    disconnect() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
         }
     }
 
-    _updateInput() {
-        if (!this.hasInputTarget) return;
-        this.inputTarget.value = JSON.stringify({
-            completed_steps: this.completedStepsValue,
-            current_step: this.currentStepValue,
-            all_done: this.completedStepsValue.length >= PREP_STEPS.length
-        });
-        this.inputTarget.dispatchEvent(new Event("input", { bubbles: true }));
+    _applyVisualChanges() {
+        const step = this.substepValue;
+
+        if (step === "tray" && this.hasTrayTarget) {
+            this.trayTarget.classList.add("is-placed");
+        } else if (step === "tape") {
+            if (this.hasTapeLeftTarget) this.tapeLeftTarget.classList.add("is-applied");
+            if (this.hasTapeRightTarget) this.tapeRightTarget.classList.add("is-applied");
+        } else if (step === "comb" && this.hasCombTarget) {
+            this.combTarget.classList.add("is-inserted");
+        } else if (step === "pour" && this.hasGelTarget) {
+            this.gelTarget.classList.add("is-poured");
+        } else if (step === "remove_comb") {
+            if (this.hasCombTarget) this.combTarget.classList.remove("is-inserted");
+            if (this.hasTapeLeftTarget) this.tapeLeftTarget.classList.remove("is-applied");
+            if (this.hasTapeRightTarget) this.tapeRightTarget.classList.remove("is-applied");
+            if (this.hasWellsTarget) this.wellsTarget.classList.add("is-visible");
+        }
+    }
+
+    _updateTimerDisplay() {
+        if (!this.hasTimerDisplayTarget) return;
+        
+        const minutes = Math.floor(this.secondsRemaining / 60);
+        const seconds = this.secondsRemaining % 60;
+        
+        const minutesStr = String(minutes).padStart(2, "0");
+        const secondsStr = String(seconds).padStart(2, "0");
+        
+        this.timerDisplayTarget.textContent = `${minutesStr}:${secondsStr}`;
+    }
+
+    _markCompleted() {
+        // Set the hidden input value
+        if (this.hasInputTarget) {
+            this.inputTarget.value = JSON.stringify({ all_done: true });
+            this.inputTarget.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+
+        // Auto-check parent step checkbox
+        const checkbox = this.element.closest("[data-step-id]")?.querySelector("[data-lab-target='stepCheckbox']");
+        if (checkbox && !checkbox.checked) {
+            checkbox.checked = true;
+            checkbox.dispatchEvent(new Event("change"));
+        }
+    }
+
+    _flashSuccess(message) {
+        document.dispatchEvent(new CustomEvent("toast:success", {
+            detail: { message }
+        }));
     }
 }

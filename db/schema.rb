@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_05_164941) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "assignment_quizzes", force: :cascade do |t|
+    t.bigint "assignment_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "master_quiz_id", null: false
+    t.bigint "school_id"
+    t.datetime "updated_at", null: false
+    t.index ["assignment_id"], name: "index_assignment_quizzes_on_assignment_id"
+    t.index ["master_quiz_id"], name: "index_assignment_quizzes_on_master_quiz_id"
+    t.index ["school_id"], name: "index_assignment_quizzes_on_school_id"
   end
 
   create_table "assignments", force: :cascade do |t|
@@ -176,22 +187,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
     t.index ["school_id"], name: "index_experiment_schools_on_school_id"
   end
 
-  create_table "experiment_steps", force: :cascade do |t|
-    t.boolean "allow_multiple", default: false
-    t.jsonb "config", default: {}
-    t.datetime "created_at", null: false
-    t.jsonb "expected_action"
-    t.bigint "experiment_id", null: false
-    t.bigint "experiment_phase_id", null: false
-    t.text "instruction"
-    t.integer "points", default: 100
-    t.integer "step_number"
-    t.string "step_type", default: "observation_input"
-    t.datetime "updated_at", null: false
-    t.index ["experiment_id"], name: "index_experiment_steps_on_experiment_id"
-    t.index ["experiment_phase_id"], name: "index_experiment_steps_on_experiment_phase_id"
-  end
-
   create_table "experiments", force: :cascade do |t|
     t.jsonb "config"
     t.datetime "created_at", null: false
@@ -205,6 +200,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["school_id"], name: "index_experiments_on_school_id"
+  end
+
+  create_table "lab_activity_logs", force: :cascade do |t|
+    t.string "action_type"
+    t.datetime "created_at", null: false
+    t.bigint "experiment_phase_id"
+    t.boolean "is_error", default: false, null: false
+    t.bigint "lab_session_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "phase_step_id"
+    t.bigint "school_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["experiment_phase_id"], name: "index_lab_activity_logs_on_experiment_phase_id"
+    t.index ["lab_session_id"], name: "index_lab_activity_logs_on_lab_session_id"
+    t.index ["phase_step_id"], name: "index_lab_activity_logs_on_phase_step_id"
+    t.index ["school_id"], name: "index_lab_activity_logs_on_school_id"
+    t.index ["user_id"], name: "index_lab_activity_logs_on_user_id"
   end
 
   create_table "lab_sessions", force: :cascade do |t|
@@ -224,14 +237,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
     t.index ["user_id"], name: "index_lab_sessions_on_user_id"
   end
 
-  create_table "phase_items", force: :cascade do |t|
+  create_table "master_quizzes", force: :cascade do |t|
+    t.string "correct_answer", null: false
     t.datetime "created_at", null: false
-    t.text "description"
-    t.bigint "experiment_phase_id", null: false
-    t.integer "position"
-    t.string "title"
+    t.bigint "experiment_id", null: false
+    t.jsonb "options", default: [], null: false
+    t.bigint "phase_step_id", null: false
+    t.integer "points", default: 10, null: false
+    t.text "question", null: false
+    t.string "question_type", default: "mcq", null: false
+    t.bigint "school_id"
     t.datetime "updated_at", null: false
-    t.index ["experiment_phase_id"], name: "index_phase_items_on_experiment_phase_id"
+    t.index ["experiment_id"], name: "index_master_quizzes_on_experiment_id"
+    t.index ["phase_step_id"], name: "index_master_quizzes_on_phase_step_id"
+    t.index ["school_id"], name: "index_master_quizzes_on_school_id"
   end
 
   create_table "phase_steps", force: :cascade do |t|
@@ -247,6 +266,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
     t.datetime "updated_at", null: false
     t.string "video_url"
     t.index ["experiment_phase_id"], name: "index_phase_steps_on_experiment_phase_id"
+  end
+
+  create_table "quiz_logs", force: :cascade do |t|
+    t.bigint "assignment_id", null: false
+    t.integer "attempt_number", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.boolean "is_correct", default: false, null: false
+    t.bigint "master_quiz_id", null: false
+    t.bigint "school_id"
+    t.text "student_answer"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["assignment_id"], name: "index_quiz_logs_on_assignment_id"
+    t.index ["master_quiz_id"], name: "index_quiz_logs_on_master_quiz_id"
+    t.index ["school_id"], name: "index_quiz_logs_on_school_id"
+    t.index ["user_id"], name: "index_quiz_logs_on_user_id"
   end
 
   create_table "schools", force: :cascade do |t|
@@ -272,11 +307,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
   create_table "step_action_labels", force: :cascade do |t|
     t.boolean "correct_match"
     t.datetime "created_at", null: false
+    t.bigint "equipment_id"
     t.string "image_url"
     t.string "label_text"
     t.integer "position"
     t.bigint "step_action_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["equipment_id"], name: "index_step_action_labels_on_equipment_id"
     t.index ["step_action_id"], name: "index_step_action_labels_on_step_action_id"
   end
 
@@ -301,18 +338,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
     t.integer "position"
     t.datetime "updated_at", null: false
     t.index ["phase_step_id"], name: "index_step_actions_on_phase_step_id"
-  end
-
-  create_table "step_options", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.bigint "experiment_step_id", null: false
-    t.boolean "is_correct"
-    t.text "label"
-    t.string "option_type"
-    t.string "option_value"
-    t.integer "position"
-    t.datetime "updated_at", null: false
-    t.index ["experiment_step_id"], name: "index_step_options_on_experiment_step_id"
   end
 
   create_table "submissions", force: :cascade do |t|
@@ -351,6 +376,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "assignment_quizzes", "assignments"
+  add_foreign_key "assignment_quizzes", "master_quizzes"
+  add_foreign_key "assignment_quizzes", "schools"
   add_foreign_key "assignments", "classrooms"
   add_foreign_key "assignments", "experiments"
   add_foreign_key "assignments", "schools"
@@ -371,21 +399,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_191431) do
   add_foreign_key "experiment_results", "users"
   add_foreign_key "experiment_schools", "experiments"
   add_foreign_key "experiment_schools", "schools"
-  add_foreign_key "experiment_steps", "experiment_phases"
-  add_foreign_key "experiment_steps", "experiments"
   add_foreign_key "experiments", "schools"
+  add_foreign_key "lab_activity_logs", "experiment_phases"
+  add_foreign_key "lab_activity_logs", "lab_sessions"
+  add_foreign_key "lab_activity_logs", "phase_steps"
+  add_foreign_key "lab_activity_logs", "schools"
+  add_foreign_key "lab_activity_logs", "users"
   add_foreign_key "lab_sessions", "experiments"
   add_foreign_key "lab_sessions", "schools"
   add_foreign_key "lab_sessions", "users"
-  add_foreign_key "phase_items", "experiment_phases"
+  add_foreign_key "master_quizzes", "experiments"
+  add_foreign_key "master_quizzes", "phase_steps"
+  add_foreign_key "master_quizzes", "schools"
   add_foreign_key "phase_steps", "experiment_phases"
+  add_foreign_key "quiz_logs", "assignments"
+  add_foreign_key "quiz_logs", "master_quizzes"
+  add_foreign_key "quiz_logs", "schools"
+  add_foreign_key "quiz_logs", "users"
   add_foreign_key "step_action_equipments", "equipment"
   add_foreign_key "step_action_equipments", "step_actions"
+  add_foreign_key "step_action_labels", "equipment"
   add_foreign_key "step_action_labels", "step_actions"
   add_foreign_key "step_action_transfers", "chemicals"
   add_foreign_key "step_action_transfers", "step_actions"
   add_foreign_key "step_actions", "phase_steps"
-  add_foreign_key "step_options", "experiment_steps"
   add_foreign_key "submissions", "experiments"
   add_foreign_key "submissions", "schools"
   add_foreign_key "submissions", "users"

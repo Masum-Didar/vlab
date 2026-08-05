@@ -97,3 +97,80 @@
     </div>
   </section>
 <% end %>
+
+<% if @activity_logs.any? %>
+  <section class="admin-panel mt-3">
+    <div class="admin-panel__heading">
+      <div>
+        <h2>Activity Log Timeline</h2>
+        <p>A step-by-step audit trail of student actions and mistakes during the experiments.</p>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Experiment</th>
+            <th>Phase / Step</th>
+            <th>Action</th>
+            <th>Details</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @activity_logs.each do |log| %>
+            <tr class="<%= 'table-danger-subtle' if log.is_error %>">
+              <td class="small text-body-secondary"><%= log.created_at.strftime("%b %d, %H:%M:%S") %></td>
+              <td><strong><%= log.lab_session.experiment.title %></strong></td>
+              <td>
+                <% if log.experiment_phase %>
+                  <%= log.experiment_phase.title %>
+                  <% if log.phase_step %>
+                    <br><span class="small text-body-secondary">Step <%= log.phase_step.step_number %></span>
+                  <% end %>
+                <% else %>
+                  —
+                <% end %>
+              </td>
+              <td>
+                <span class="badge text-bg-light border text-dark"><%= log.action_type.humanize %></span>
+              </td>
+              <td class="small">
+                <% if log.is_error %>
+                  <span class="text-danger fw-bold"><%= log.metadata["error_message"] %></span>
+                <% else %>
+                  <% if log.action_type == "transfer" %>
+                    Loaded <strong><%= log.metadata.dig("action_data", "sample") %></strong> into <strong><%= log.metadata.dig("action_data", "target") %></strong>
+                  <% elsif log.action_type == "voltage_set" %>
+                    Set power supply to <strong><%= log.metadata.dig("action_data", "voltage") %> V</strong>
+                  <% elsif log.action_type == "gel_prep" %>
+                    Action: <strong><%= log.metadata.dig("action_data", "gel_prep_data") ? JSON.parse(log.metadata.dig("action_data", "gel_prep_data"))["completed_steps"] : "completed" %></strong>
+                  <% else %>
+                    <%= log.phase_step&.instruction || "Phase completed successfully" %>
+                  <% end %>
+                <% end %>
+              </td>
+              <td>
+                <% if log.is_error %>
+                  <span class="badge text-bg-danger">Error</span>
+                <% elsif log.action_type == "phase_complete" %>
+                  <span class="badge text-bg-success">Phase Completed</span>
+                <% else %>
+                  <span class="badge text-bg-success">Success</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% else %>
+  <div class="admin-empty mt-3">
+    <h2>No activity logs</h2>
+    <p>This student has not performed any loggable actions in active lab sessions yet.</p>
+  </div>
+<% end %>
+

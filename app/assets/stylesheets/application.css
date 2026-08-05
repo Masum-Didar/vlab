@@ -1327,6 +1327,32 @@
   overflow: hidden;
 }
 
+.gel-prep__tape {
+  background: #fde047;
+  border: 1px solid #fef08a;
+  width: 0.8rem;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 5;
+}
+
+.gel-prep__tape--left {
+  left: 0;
+  transform: rotate(-1deg);
+}
+
+.gel-prep__tape--right {
+  right: 0;
+  transform: rotate(1deg);
+}
+
+.gel-prep__tape.is-applied {
+  opacity: 0.85;
+}
+
 .gel-prep__comb {
   align-items: center;
   display: flex;
@@ -1470,6 +1496,171 @@
   width: 1.5rem;
 }
 
+/* Label Match Drag-and-Drop */
+.label-match {
+  margin-top: 0.75rem;
+}
+
+.label-match__instructions p {
+  color: #667381;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.label-match__status {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0d6b78;
+  margin-bottom: 0.75rem;
+}
+
+.label-match__dropzones {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.label-match__dropzone {
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  cursor: default;
+  min-height: 5rem;
+  padding: 0.5rem;
+  position: relative;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.label-match__dropzone.is-dragover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  transform: scale(1.02);
+}
+
+.label-match__dropzone.is-wrong {
+  border-color: #ef4444;
+  background: #fef2f2;
+  animation: labelMatchShake 0.4s ease;
+}
+
+.label-match__dropzone.is-matched {
+  border-color: #22c55e;
+  background: #f0fdf4;
+  border-style: solid;
+}
+
+@keyframes labelMatchShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+}
+
+.label-match__dropzone-visual {
+  align-items: center;
+  background: #e2e8f0;
+  border-radius: 4px;
+  display: flex;
+  height: 3rem;
+  justify-content: center;
+  margin-bottom: 0.35rem;
+}
+
+.label-match__dropzone-visual--tray { background: #cbd5e1; }
+.label-match__dropzone-visual--comb { background: #94a3b8; }
+.label-match__dropzone-visual--chamber { background: #d4a867; }
+.label-match__dropzone-visual--power { background: #64748b; }
+.label-match__dropzone-visual--pipette { background: #6366f1; }
+.label-match__dropzone-visual--uv { background: #34206f; }
+.label-match__dropzone-visual--flask { background: #818cf8; }
+.label-match__dropzone-visual--agarose { background: #a78bfa; }
+
+.label-match__dropzone-icon {
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.label-match__dropzone-name {
+  color: #475569;
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.label-match__dropzone-label {
+  display: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.label-match__dropzone.is-matched .label-match__dropzone-label--placed {
+  color: #16a34a;
+  display: block;
+}
+
+.label-match__labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  min-height: 3rem;
+}
+
+.label-match__draggable {
+  background: #fff;
+  border: 2px solid #3b82f6;
+  border-radius: 6px;
+  color: #1e40af;
+  cursor: grab;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.5rem 0.85rem;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.label-match__draggable:hover {
+  background: #eff6ff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.label-match__draggable:active {
+  cursor: grabbing;
+}
+
+.label-match__draggable.is-dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+.label-match__draggable.is-matched {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #166534;
+  cursor: default;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .label-match__dropzones {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* Gel Run */
 .gel-run {
   margin-top: 0.75rem;
@@ -1522,3 +1713,137 @@
 .gel-run__start {
   width: 100%;
 }
+
+/* UV Examination CSS */
+.uv-exam {
+  margin-top: 0.75rem;
+}
+
+.uv-exam__chamber {
+  background: #334155; /* Metallic outer casing */
+  border: 4px solid #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.5s ease;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.uv-exam__chamber.is-active {
+  background: #020617; /* Dark room background */
+  border-color: #0f172a;
+  box-shadow: inset 0 0 40px rgba(139, 92, 246, 0.35), 0 10px 25px -5px rgba(139, 92, 246, 0.2);
+}
+
+.uv-exam__gel {
+  background: #475569;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.5s ease;
+}
+
+.uv-exam__chamber.is-active .uv-exam__gel {
+  background: #090d16;
+  border: 1px solid #1e1b4b;
+}
+
+.uv-exam__gel-header {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  transition: all 0.5s ease;
+}
+
+.uv-exam__chamber.is-active .uv-exam__gel-header {
+  color: #818cf8;
+}
+
+.uv-exam__gel-body {
+  border-radius: 6px;
+  overflow: hidden;
+  background: #64748b;
+  transition: all 0.5s ease;
+}
+
+.uv-exam__chamber.is-active .uv-exam__gel-body {
+  background: #030712;
+}
+
+.uv-exam__gel-svg {
+  display: block;
+}
+
+.uv-exam__gel-rect {
+  fill: #475569;
+  transition: all 0.5s ease;
+}
+
+.uv-exam__chamber.is-active .uv-exam__gel-rect {
+  fill: #0d121f;
+}
+
+.uv-exam__band {
+  fill: #334155;
+  opacity: 0.15;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glowing states for bands */
+.uv-exam__band.is-glowing {
+  opacity: 0.95;
+}
+
+.uv-exam__band--ladder.is-glowing {
+  fill: #38bdf8; /* Glowing neon blue for ladder */
+  filter: drop-shadow(0 0 5px #0ea5e9) drop-shadow(0 0 10px #0284c7);
+}
+
+.uv-exam__band--wild-type.is-glowing,
+.uv-exam__band--mutant.is-glowing,
+.uv-exam__band--heterozygous.is-glowing {
+  fill: #f43f5e; /* Glowing reddish-orange (Ethidium Bromide) for samples */
+  filter: drop-shadow(0 0 6px #e11d48) drop-shadow(0 0 12px #be123c);
+}
+
+/* Power button indicator dot */
+.uv-exam__indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444; /* red when off */
+  display: inline-block;
+  box-shadow: 0 0 4px #f87171;
+  transition: all 0.3s ease;
+}
+
+.uv-exam__indicator-dot.is-active {
+  background-color: #22c55e; /* green when on */
+  box-shadow: 0 0 8px #4ade80, 0 0 16px #22c55e;
+}
+
+/* Conclusion Genotype Table CSS */
+.conclusion-table-container {
+  margin-top: 0.75rem;
+}
+
+.conclusion-table-container table {
+  background-color: #ffffff;
+}
+
+.conclusion-table-container select.form-select-sm {
+  font-size: 0.82rem;
+  font-weight: 550;
+  border-color: #cbd5e1;
+}
+
+.conclusion-table-container select.form-select-sm:focus {
+  border-color: #0d6b78;
+  box-shadow: 0 0 0 0.18rem rgba(13, 107, 120, 0.15);
+}
+
+

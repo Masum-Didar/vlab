@@ -1,5 +1,6 @@
 class Faculty::AssignmentsController < Faculty::BaseController
-  before_action :set_classrooms, only: [:new, :create]
+  before_action :set_classrooms, only: [:new, :create, :edit, :update]
+  before_action :set_assignment, only: [:edit, :update, :destroy]
 
   def index
     @assignments = Assignment.where(faculty: current_user)
@@ -10,6 +11,7 @@ class Faculty::AssignmentsController < Faculty::BaseController
   def new
     @assignment = Assignment.new
     @experiments = Experiment.where(published: true).order(:title)
+    @all_quizzes = MasterQuiz.all.includes(:experiment)
   end
 
   def create
@@ -20,8 +22,29 @@ class Faculty::AssignmentsController < Faculty::BaseController
       redirect_to faculty_assignments_path, notice: "Assignment created successfully."
     else
       @experiments = Experiment.where(published: true).order(:title)
+      @all_quizzes = MasterQuiz.all.includes(:experiment)
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def edit
+    @experiments = Experiment.where(published: true).order(:title)
+    @all_quizzes = MasterQuiz.all.includes(:experiment)
+  end
+
+  def update
+    if @assignment.update(assignment_params)
+      redirect_to faculty_assignments_path, notice: "Assignment updated successfully."
+    else
+      @experiments = Experiment.where(published: true).order(:title)
+      @all_quizzes = MasterQuiz.all.includes(:experiment)
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @assignment.destroy
+    redirect_to faculty_assignments_path, notice: "Assignment deleted successfully."
   end
 
   private
@@ -30,7 +53,11 @@ class Faculty::AssignmentsController < Faculty::BaseController
     @classrooms = Classroom.where(school: current_user.school).order(:name)
   end
 
+  def set_assignment
+    @assignment = Assignment.where(faculty: current_user).find(params[:id])
+  end
+
   def assignment_params
-    params.require(:assignment).permit(:classroom_id, :experiment_id, :due_date, :status)
+    params.require(:assignment).permit(:classroom_id, :experiment_id, :due_date, :status, master_quiz_ids: [])
   end
 end

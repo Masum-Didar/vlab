@@ -1,23 +1,37 @@
+<%
+  action = step.step_actions.first
+  config = action&.config || {}
+  substep = config["substep"]
+  timer_duration = step.timer_duration || 0
+%>
+
 <div class="gel-prep"
      data-controller="gel-prep"
-     data-gel-prep-completed-steps-value="[]"
-     data-gel-prep-current-step-value="0">
-  <div class="gel-prep__progress-bar">
-    <div class="gel-prep__progress-fill" data-gel-prep-target="progress">0%</div>
-  </div>
-
-  <div class="gel-prep__visual">
-    <div class="gel-prep__tray" data-gel-prep-target="tray">
+     data-gel-prep-substep-value="<%= substep %>"
+     data-gel-prep-timer-duration-value="<%= timer_duration %>">
+  
+  <div class="gel-prep__visual mb-3">
+    <div class="gel-prep__tray <%= 'is-placed' if ['tray', 'tape', 'comb', 'etbr', 'pour', 'solidify', 'remove_comb', 'buffer'].include?(substep) %>" data-gel-prep-target="tray">
       <div class="gel-prep__tray-body">
-        <div class="gel-prep__comb" data-gel-prep-target="comb">
+        
+        <!-- Tape visual -->
+        <div class="gel-prep__tape gel-prep__tape--left <%= 'is-applied' if ['tape', 'comb', 'etbr', 'pour', 'solidify', 'remove_comb', 'buffer'].include?(substep) %>" data-gel-prep-target="tapeLeft"></div>
+        <div class="gel-prep__tape gel-prep__tape--right <%= 'is-applied' if ['tape', 'comb', 'etbr', 'pour', 'solidify', 'remove_comb', 'buffer'].include?(substep) %>" data-gel-prep-target="tapeRight"></div>
+
+        <!-- Comb visual -->
+        <div class="gel-prep__comb <%= 'is-inserted' if ['comb', 'etbr', 'pour', 'solidify'].include?(substep) %>" data-gel-prep-target="comb">
           <div class="gel-prep__comb-teeth">
             <% 5.times do %><span></span><% end %>
           </div>
         </div>
-        <div class="gel-prep__gel" data-gel-prep-target="gel">
+
+        <!-- Gel visual -->
+        <div class="gel-prep__gel <%= 'is-poured' if ['pour', 'solidify', 'remove_comb', 'buffer'].include?(substep) %> <%= 'is-solidified' if ['solidify', 'remove_comb', 'buffer'].include?(substep) %>" data-gel-prep-target="gel">
           <div class="gel-prep__gel-surface"></div>
         </div>
-        <div class="gel-prep__wells" data-gel-prep-target="wells">
+
+        <!-- Wells visual -->
+        <div class="gel-prep__wells <%= 'is-visible' if ['remove_comb', 'buffer'].include?(substep) %>" data-gel-prep-target="wells">
           <% 5.times do |i| %>
             <div class="gel-prep__well"></div>
           <% end %>
@@ -26,53 +40,72 @@
     </div>
   </div>
 
-  <ul class="gel-prep__steps">
-    <li class="gel-prep__step is-current" data-gel-prep-target="step" data-prep-step="0">
-      <div class="gel-prep__step-head">
-        <span class="gel-prep__step-number">1</span>
-        <span>Place casting tray on workbench</span>
+  <div class="gel-prep__interactive">
+    <% case substep %>
+    <% when "tray" %>
+      <div class="d-flex flex-column gap-2">
+        <p class="text-body-secondary small">Place the clean gel casting tray on the workbench level surface.</p>
+        <button type="button" class="btn btn-primary btn-sm w-100" data-action="click->gel-prep#performAction" data-gel-prep-target="actionButton">
+          Place Casting Tray
+        </button>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="0">
-        Place tray
-      </button>
-    </li>
-    <li class="gel-prep__step" data-gel-prep-target="step" data-prep-step="1">
-      <div class="gel-prep__step-head">
-        <span class="gel-prep__step-number">2</span>
-        <span>Insert comb to create wells</span>
+    <% when "tape" %>
+      <div class="d-flex flex-column gap-2">
+        <p class="text-body-secondary small">Apply masking tape to both open ends of the casting tray to prevent liquid agarose from leaking out.</p>
+        <button type="button" class="btn btn-primary btn-sm w-100" data-action="click->gel-prep#performAction" data-gel-prep-target="actionButton">
+          Apply Masking Tape
+        </button>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="1">
-        Insert comb
-      </button>
-    </li>
-    <li class="gel-prep__step" data-gel-prep-target="step" data-prep-step="2">
-      <div class="gel-prep__step-head">
-        <span class="gel-prep__step-number">3</span>
-        <span>Pour prepared agarose gel into tray</span>
+    <% when "comb" %>
+      <div class="d-flex flex-column gap-2">
+        <p class="text-body-secondary small">Insert the gel comb into the slots near one end of the tray to create wells for loading DNA samples.</p>
+        <button type="button" class="btn btn-primary btn-sm w-100" data-action="click->gel-prep#performAction" data-gel-prep-target="actionButton">
+          Insert Gel Comb
+        </button>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="2">
-        Pour agarose
-      </button>
-    </li>
-    <li class="gel-prep__step" data-gel-prep-target="step" data-prep-step="3">
-      <div class="gel-prep__step-head">
-        <span class="gel-prep__step-number">4</span>
-        <span>Wait for gel to solidify</span>
+    <% when "etbr" %>
+      <div class="d-flex flex-column gap-2 p-3 border border-warning bg-warning bg-opacity-10 rounded text-warning-emphasis">
+        <h6 class="small fw-bold mb-1">⚠️ Safety Warning: Ethidium Bromide</h6>
+        <p class="x-small mb-2">Ethidium Bromide (EtBr) is a powerful mutagen and moderate toxin. Always wear nitrile gloves, laboratory coat, and protective eyewear.</p>
+        <button type="button" class="btn btn-warning btn-sm w-100 fw-bold" data-action="click->gel-prep#performAction" data-gel-prep-target="actionButton">
+          Add Ethidium Bromide (1.5 µL)
+        </button>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="3">
-        Solidify
-      </button>
-    </li>
-    <li class="gel-prep__step" data-gel-prep-target="step" data-prep-step="4">
-      <div class="gel-prep__step-head">
-        <span class="gel-prep__step-number">5</span>
-        <span>Remove comb to reveal wells</span>
+    <% when "pour" %>
+      <div class="d-flex flex-column gap-2">
+        <p class="text-body-secondary small">Pour the warm agarose solution containing EtBr slowly into the sealed casting tray.</p>
+        <button type="button" class="btn btn-primary btn-sm w-100" data-action="click->gel-prep#performAction" data-gel-prep-target="actionButton">
+          Pour Agarose Gel
+        </button>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" data-action="click->gel-prep#nextStep" data-prep-step="4">
-        Remove comb
-      </button>
-    </li>
-  </ul>
+    <% when "solidify" %>
+      <div class="d-flex flex-column gap-2">
+        <p class="text-body-secondary small">Let the gel cool and solidify at room temperature for approximately 10 minutes.</p>
+        
+        <div class="d-flex align-items-center justify-content-center gap-2 my-2 py-2 border rounded bg-light">
+          <span class="fs-4 fw-mono text-primary" data-gel-prep-target="timerDisplay">10:00</span>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-sm w-100" data-action="click->gel-prep#startSolidification" data-gel-prep-target="actionButton">
+          Start Solidification Timer
+        </button>
+      </div>
+    <% when "remove_comb" %>
+      <div class="d-flex flex-column gap-2">
+        <p class="text-body-secondary small">Carefully pull the comb straight up out of the solidified gel, and remove the masking tape from both ends.</p>
+        <button type="button" class="btn btn-primary btn-sm w-100" data-action="click->gel-prep#performAction" data-gel-prep-target="actionButton">
+          Remove Comb & Tape
+        </button>
+      </div>
+    <% when "buffer" %>
+      <div class="d-flex flex-column gap-2">
+        <p class="text-body-secondary small">Place the gel into the chamber and cover it completely with 1x TAE buffer solution.</p>
+        <button type="button" class="btn btn-primary btn-sm w-100" data-action="click->gel-prep#performAction" data-gel-prep-target="actionButton">
+          Pour 1x TAE Buffer
+        </button>
+      </div>
+    <% end %>
+  </div>
 
   <input type="hidden" name="gel_prep_data" data-gel-prep-target="input" data-action-input>
 </div>

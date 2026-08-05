@@ -72,14 +72,24 @@ Rails.application.routes.draw do
     resources :experiments do
       resources :dna_band_configs, only: [:index, :create, :edit, :update, :destroy]
     end
+    resources :faculty, only: [:index] do
+      member do
+        post :approve
+        delete :reject
+      end
+    end
     # Admin root
     root to: 'dashboard#index'
   end
 
   # --- Faculty Routes ---
   namespace :faculty do
-    resources :assignments, only: [:index, :new, :create]
-    resources :progress, only: [:index, :show]
+    resources :assignments
+    resources :progress, only: [:index, :show] do
+      collection do
+        get :export_csv
+      end
+    end
     resources :classrooms, only: [:index, :new, :create, :show] do
       collection do
         get :download_template
@@ -97,6 +107,8 @@ Rails.application.routes.draw do
     member do
       get :lab
       post :run_step
+      get :download_report
+      post :submit_quiz
     end
   end
 

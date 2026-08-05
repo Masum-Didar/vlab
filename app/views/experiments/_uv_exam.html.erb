@@ -1,0 +1,59 @@
+<% configs = @experiment.dna_band_configs.order(:well_number) %>
+
+<div class="uv-exam"
+     data-controller="uv-exam"
+     data-uv-exam-uv-on-value="false">
+  
+  <div class="uv-exam__chamber mb-3" data-uv-exam-target="chamber">
+    <div class="uv-exam__gel">
+      <!-- Gel header showing well markings -->
+      <div class="uv-exam__gel-header">
+        <% 4.times do |i| %>
+          <div class="uv-exam__well-label">Well <%= i + 1 %></div>
+        <% end %>
+      </div>
+
+      <!-- Gel body with lanes and bands -->
+      <div class="uv-exam__gel-body">
+        <svg viewBox="0 0 400 240" class="uv-exam__gel-svg" width="100%" height="100%">
+          <!-- Gel background -->
+          <rect x="0" y="0" width="400" height="240" rx="8" class="uv-exam__gel-rect" />
+          
+          <!-- Lanes -->
+          <% configs.each_with_index do |cfg, lane_idx| %>
+            <% x_coord = 50 + (lane_idx * 100) %>
+            
+            <!-- Lane line indicator -->
+            <line x1="<%= x_coord %>" y1="20" x2="<%= x_coord %>" y2="220" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4" />
+            
+            <!-- DNA Bands -->
+            <% cfg.band_positions.each do |pos| %>
+              <!-- Band represented as a rounded rect -->
+              <rect x="<%= x_coord - 25 %>" 
+                    y="<%= pos + 10 %>" 
+                    width="50" 
+                    height="6" 
+                    rx="2" 
+                    class="uv-exam__band uv-exam__band--<%= cfg.sample_name.parameterize %>" 
+                    data-uv-exam-target="band" />
+            <% end %>
+          <% end %>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="uv-exam__controls border rounded p-3 bg-light d-flex flex-column align-items-center gap-2">
+    <p class="small text-body-secondary text-center mb-1">Turn on the ultraviolet transilluminator light to cause the Ethidium Bromide bound to the DNA to fluoresce.</p>
+    
+    <button type="button" 
+            class="btn btn-dark btn-sm px-4 fw-bold d-flex align-items-center gap-2" 
+            data-action="click->uv-exam#toggleUV" 
+            data-uv-exam-target="powerButton">
+      <span class="uv-exam__indicator-dot" data-uv-exam-target="indicator"></span>
+      Turn ON UV Light
+    </button>
+  </div>
+
+  <input type="hidden" name="uv_data" data-uv-exam-target="input" data-action-input>
+</div>

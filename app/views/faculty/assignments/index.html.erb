@@ -39,8 +39,10 @@
                   <%= assignment.status.titleize %>
                 </span>
               </td>
-              <td class="text-end text-body-secondary small">
-                <%= assignment.created_at.strftime("%b %d, %Y") %>
+              <td class="text-end">
+                <span class="text-body-secondary small me-3"><%= assignment.created_at.strftime("%b %d, %Y") %></span>
+                <%= link_to "Edit", edit_faculty_assignment_path(assignment), class: "btn btn-sm btn-outline-primary py-0" %>
+                <%= link_to "Delete", faculty_assignment_path(assignment), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "btn btn-sm btn-outline-danger py-0" %>
               </td>
             </tr>
           <% end %>

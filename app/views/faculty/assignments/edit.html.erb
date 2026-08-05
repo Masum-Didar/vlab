@@ -1,0 +1,14 @@
+<% content_for :title, "Edit assignment" %>
+
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Faculty workspace</p>
+    <h1>Edit assignment</h1>
+    <p>Modify assignment settings and assigned quizzes.</p>
+  </div>
+</header>
+
+<%= render "form", assignment: @assignment, 
+                  classrooms: @classrooms, 
+                  experiments: @experiments, 
+                  all_quizzes: @all_quizzes %>

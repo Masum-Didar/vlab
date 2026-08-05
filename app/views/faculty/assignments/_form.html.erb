@@ -1,0 +1,63 @@
+<%= form_with model: [:faculty, assignment], class: "admin-panel", data: { controller: "assignment-form" }, local: true do |f| %>
+  <% if assignment.errors.any? %>
+    <div class="alert alert-danger">
+      <p><%= pluralize(assignment.errors.count, "error") %>:</p>
+      <ul class="mb-0">
+        <% assignment.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :classroom_id, "Classroom", class: "form-label fw-semibold" %>
+    <div class="d-flex gap-2 align-items-start">
+      <%= f.collection_select :classroom_id, classrooms, :id, :name, { prompt: "Select classroom" }, class: "form-select", style: "max-width: 24rem;" %>
+      <%= link_to "+ New classroom", new_faculty_classroom_path, class: "btn btn-outline-primary btn-sm mt-0", target: "_blank", rel: "noopener" %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :experiment_id, "Experiment", class: "form-label fw-semibold" %>
+    <%= f.collection_select :experiment_id, experiments, :id, :title, { prompt: "Select experiment" }, 
+                            { class: "form-select", style: "max-width: 24rem;",
+                              data: { action: "change->assignment-form#toggleQuizzes", 
+                                      assignment_form_target: "experimentSelect" } } %>
+  </div>
+
+  <!-- Quizzes Selection Section -->
+  <div class="mb-3 d-none" data-assignment-form-target="quizzesContainer">
+    <label class="form-label fw-semibold">Select Quizzes to Include (Optional)</label>
+    <p class="text-body-secondary small mb-2">Check the questions you want to assign to students for this lab experiment.</p>
+    
+    <div class="border rounded p-3 bg-white" style="max-width: 32rem;">
+      <% all_quizzes.each do |quiz| %>
+        <div class="form-check mb-2 d-none" 
+             data-assignment-form-target="quizRow" 
+             data-experiment-id="<%= quiz.experiment_id %>">
+          <%= check_box_tag "assignment[master_quiz_ids][]", quiz.id, f.object.master_quiz_ids.include?(quiz.id), 
+                            id: "quiz_#{quiz.id}", class: "form-check-input" %>
+          <%= label_tag "quiz_#{quiz.id}", class: "form-check-label small" do %>
+            <strong>Q:</strong> <%= quiz.question %> <span class="badge text-bg-secondary"><%= quiz.points %> pts</span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :due_date, "Due date (optional)", class: "form-label fw-semibold" %>
+    <%= f.date_field :due_date, class: "form-control", style: "max-width: 16rem;" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :status, "Status", class: "form-label fw-semibold" %>
+    <%= f.select :status, Assignment.statuses.keys.map { |s| [s.titleize, s] }, {}, class: "form-select", style: "max-width: 12rem;" %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit assignment.new_record? ? "Assign" : "Save Changes", class: "btn btn-primary" %>
+    <%= link_to "Cancel", faculty_assignments_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

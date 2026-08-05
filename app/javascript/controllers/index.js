@@ -25,3 +25,17 @@ import GelPrepController from "./gel_prep_controller"
 application.register("gel-prep", GelPrepController)
 import GelRunController from "./gel_run_controller"
 application.register("gel-run", GelRunController)
+import LabelMatchController from "./label_match_controller"
+application.register("label-match", LabelMatchController)
+
+import UvExamController from "./uv_exam_controller"
+application.register("uv-exam", UvExamController)
+
+import ConclusionTableController from "./conclusion_table_controller"
+application.register("conclusion-table", ConclusionTableController)
+
+import AssignmentFormController from "./assignment_form_controller"
+application.register("assignment-form", AssignmentFormController)
+
+import StudentQuizController from "./student_quiz_controller"
+application.register("student-quiz", StudentQuizController)

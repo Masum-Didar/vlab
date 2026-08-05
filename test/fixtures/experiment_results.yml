@@ -3,11 +3,13 @@
 one:
   user: one
   experiment: one
-  data: 
-  status: MyString
+  school: one
+  status: started
+  data: {}
 
 two:
   user: two
   experiment: two
-  data: 
-  status: MyString
+  school: two
+  status: started
+  data: {}

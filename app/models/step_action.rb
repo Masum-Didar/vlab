@@ -21,7 +21,9 @@ class StepAction < ApplicationRecord
     voltage_set: 9,
     gel_band_match: 10,
     gel_prep: 11,
-    gel_run: 12
+    gel_run: 12,
+    uv_exam: 13,
+    conclusion: 14
   }
 
   validates :action_type, presence: true

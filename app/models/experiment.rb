@@ -6,6 +6,9 @@ class Experiment < ApplicationRecord
   has_many :experiment_equipments, dependent: :destroy
   has_many :experiment_results, dependent: :destroy
   has_many :experiment_schools, dependent: :destroy
+  has_many :submissions, dependent: :destroy
+  has_many :lab_sessions, dependent: :destroy
+  has_many :master_quizzes, dependent: :destroy
   has_many :schools, through: :experiment_schools
   has_many :dna_band_configs, -> { order(:well_number) }, dependent: :destroy
 

@@ -12,6 +12,8 @@ class User < ApplicationRecord
   has_many :classroom_memberships, dependent: :destroy
   has_many :classrooms, through: :classroom_memberships
   has_many :assignments, foreign_key: :faculty_id, dependent: :nullify
+  has_many :lab_activity_logs, dependent: :destroy
+  has_many :quiz_logs, dependent: :destroy
 
   enum :role, { student: 0, faculty: 1, administrator: 2, super_admin: 3 }
 

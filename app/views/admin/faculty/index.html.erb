@@ -1,0 +1,55 @@
+<% content_for :title, "Faculty Approvals" %>
+
+<header class="admin-page-head">
+  <div>
+    <h1>Faculty Approvals</h1>
+    <p>Approve or reject faculty registration requests for your school.</p>
+  </div>
+</header>
+
+<section class="admin-table-card">
+  <% if @faculty.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Registered</th>
+            <th class="text-end"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @faculty.each do |faculty| %>
+            <tr>
+              <td><strong><%= faculty.full_name %></strong></td>
+              <td class="text-body-secondary"><%= faculty.email %></td>
+              <td>
+                <% if faculty.approved? %>
+                  <span class="badge text-bg-success">Approved</span>
+                <% else %>
+                  <span class="badge text-bg-warning">Pending</span>
+                <% end %>
+              </td>
+              <td class="small text-body-secondary"><%= faculty.created_at.strftime("%b %d, %Y") %></td>
+              <td class="text-end">
+                <% unless faculty.approved? %>
+                  <div class="btn-group btn-group-sm">
+                    <%= button_to "Approve", approve_admin_faculty_path(faculty), class: "btn btn-success" %>
+                    <%= button_to "Reject", reject_admin_faculty_path(faculty), method: :delete, class: "btn btn-outline-danger", data: { confirm: "Remove this faculty member?" } %>
+                  </div>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="admin-empty">
+      <h2>No faculty registrations</h2>
+      <p>Faculty members will appear here when they register for your school.</p>
+    </div>
+  <% end %>
+</section>

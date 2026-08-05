@@ -1,6 +1,6 @@
 class ExperimentsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_experiment, only: [:show, :lab, :run_step]
+  before_action :set_experiment, only: [:show, :lab, :run_step, :download_report]
   before_action :set_lab_session, only: [:lab, :run_step]
 
   def index
@@ -23,6 +23,59 @@ class ExperimentsController < ApplicationController
   end
 
   def lab
+    @assignment = Assignment.where(
+      classroom: current_user.classroom_ids,
+      experiment: @experiment,
+      status: :active
+    ).order(:due_date).first
+  end
+
+  def submit_quiz
+    assignment = Assignment.where(
+      classroom: current_user.classroom_ids,
+      experiment: @experiment,
+      status: :active
+    ).order(:due_date).first
+
+    return render json: { error: "No active assignment found." }, status: :unprocessable_entity unless assignment
+
+    quiz = assignment.master_quizzes.find(params[:quiz_id])
+    is_correct = (params[:answer] == quiz.correct_answer)
+
+    attempts = QuizLog.where(user: current_user, assignment: assignment, master_quiz: quiz).count
+    attempt_number = attempts + 1
+
+    QuizLog.create!(
+      school: current_user.school,
+      user: current_user,
+      assignment: assignment,
+      master_quiz: quiz,
+      student_answer: params[:answer],
+      is_correct: is_correct,
+      attempt_number: attempt_number
+    )
+
+    LabActivityLog.create!(
+      user: current_user,
+      lab_session: LabSession.find_by(user: current_user, experiment: @experiment),
+      experiment_phase: quiz.phase_step.experiment_phase,
+      phase_step: quiz.phase_step,
+      action_type: "quiz_submit",
+      metadata: { quiz_question: quiz.question, student_answer: params[:answer], attempt: attempt_number, is_correct: is_correct },
+      is_error: !is_correct
+    )
+
+    render json: { correct: is_correct, message: is_correct ? "Correct!" : "Incorrect answer. Try again!" }
+  end
+
+  def download_report
+    @lab_session = LabSession.find_by!(user: current_user, experiment: @experiment)
+    
+    pdf_data = PdfGenerator.generate(@lab_session)
+    send_data pdf_data,
+              filename: "lab_report_#{@experiment.title.parameterize}_#{Time.current.strftime('%Y%m%d')}.pdf",
+              type: "application/pdf",
+              disposition: "attachment"
   end
 
   def run_step
@@ -51,8 +104,28 @@ class ExperimentsController < ApplicationController
     validation = validate_and_process_step_actions(actions, action_data)
 
     if validation&.dig(:valid) == false
+      LabActivityLog.create!(
+        user: current_user,
+        lab_session: @lab_session,
+        experiment_phase: phase,
+        phase_step: step,
+        action_type: action_type || actions.first&.action_type || "unknown",
+        metadata: { error_message: validation[:message], action_data: action_data },
+        is_error: true
+      )
       return render json: { error: validation[:message] }, status: :unprocessable_entity
     end
+
+    # Log successful action
+    LabActivityLog.create!(
+      user: current_user,
+      lab_session: @lab_session,
+      experiment_phase: phase,
+      phase_step: step,
+      action_type: action_type || actions.first&.action_type || "unknown",
+      metadata: { action_data: action_data },
+      is_error: false
+    )
 
     all_steps_complete = phase.phase_steps.all? do |s|
       params[:completed_step_ids]&.include?(s.id.to_s)
@@ -60,6 +133,14 @@ class ExperimentsController < ApplicationController
 
     if all_steps_complete
       @lab_session.complete_phase!(phase_number)
+      LabActivityLog.create!(
+        user: current_user,
+        lab_session: @lab_session,
+        experiment_phase: phase,
+        action_type: "phase_complete",
+        metadata: { phase_number: phase_number },
+        is_error: false
+      )
     end
 
     render json: {
@@ -81,6 +162,24 @@ class ExperimentsController < ApplicationController
   end
 
   def set_lab_session
+    if current_user.student?
+      assignment = Assignment.where(
+        classroom: current_user.classroom_ids,
+        experiment: @experiment,
+        status: :active
+      ).order(:due_date).first
+
+      if assignment&.due_date && Time.current > assignment.due_date
+        msg = "Assignment past due. The due date was #{assignment.due_date.strftime('%b %d, %Y')}."
+        if request.format.json?
+          render json: { error: msg }, status: :unprocessable_entity
+        else
+          redirect_to experiments_path, alert: msg
+        end
+        return
+      end
+    end
+
     @lab_session = LabSession.find_or_create_by!(
       user: current_user,
       experiment: @experiment
@@ -118,7 +217,8 @@ class ExperimentsController < ApplicationController
     case action.action_type
     when "label_match"
       correct = action.step_action_labels.where(correct_match: true).pluck(:label_text)
-      selected = data[:selected_labels] || []
+      raw = data[:selected_labels] || []
+      selected = raw.is_a?(String) ? JSON.parse(raw) : raw
       missing = correct - selected
       if missing.any?
         return { valid: false, message: "Missing labels: #{missing.join(', ')}" }
@@ -172,6 +272,29 @@ class ExperimentsController < ApplicationController
       run_data = data[:gel_run_data].is_a?(String) ? JSON.parse(data[:gel_run_data]) : (data[:gel_run_data] || {})
       unless run_data["complete"] == true || run_data["complete"] == "true"
         return { valid: false, message: "Wait for the electrophoresis run to complete." }
+      end
+    when "uv_exam"
+      uv_data = data[:uv_data].is_a?(String) ? JSON.parse(data[:uv_data]) : (data[:uv_data] || {})
+      unless uv_data["uv_on"] == true || uv_data["uv_on"] == "true"
+        return { valid: false, message: "Turn on the UV light to visualize the DNA bands." }
+      end
+    when "conclusion"
+      conclusion_data = data[:conclusion_data].is_a?(String) ? JSON.parse(data[:conclusion_data]) : (data[:conclusion_data] || {})
+      expected = action.config || {}
+      
+      errors = []
+      if conclusion_data["sample_a"] != expected["sample_a_expected"]
+        errors << "Sample A genotype selection is incorrect."
+      end
+      if conclusion_data["sample_b"] != expected["sample_b_expected"]
+        errors << "Sample B genotype selection is incorrect."
+      end
+      if conclusion_data["sample_c"] != expected["sample_c_expected"]
+        errors << "Sample C genotype selection is incorrect."
+      end
+
+      if errors.any?
+        return { valid: false, message: errors.join(" ") }
       end
     end
     { valid: true }

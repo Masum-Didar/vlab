@@ -29,8 +29,20 @@
     <div class="col-12 col-sm-6 col-lg-3">
       <div class="card border shadow-sm">
         <div class="card-body">
-          <p class="text-body-secondary small mb-0">Pending Reviews</p>
+          <p class="text-body-secondary small mb-0">Pending Experiments</p>
           <h3 class="h4 fw-semibold mt-2 mb-0"><%= @pending_count %></h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card border shadow-sm <%= 'border-warning' if @pending_faculty_count > 0 %>">
+        <div class="card-body">
+          <p class="text-body-secondary small mb-0">Pending Faculty</p>
+          <h3 class="h4 fw-semibold mt-2 mb-0">
+            <%= link_to admin_faculty_index_path, class: "text-decoration-none #{@pending_faculty_count > 0 ? 'text-warning' : 'text-body'}" do %>
+              <%= @pending_faculty_count %>
+            <% end %>
+          </h3>
         </div>
       </div>
     </div>

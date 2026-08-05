@@ -278,7 +278,11 @@
                             </div>
 
                             <div class="admin-config-panel" data-config-panel="gel_band_match">
-                              <p class="small text-body-secondary mb-0">Manage expected band positions in the <%= link_to "DNA Band Config", admin_experiment_dna_band_configs_path(@experiment) %> section.</p>
+                              <% if @experiment.persisted? %>
+                                <p class="small text-body-secondary mb-0">Manage expected band positions in the <%= link_to "DNA Band Config", admin_experiment_dna_band_configs_path(@experiment) %> section.</p>
+                              <% else %>
+                                <p class="small text-body-secondary mb-0">Save this experiment first to configure DNA bands.</p>
+                              <% end %>
                             </div>
                             <div class="admin-config-panel" data-config-panel="pipette_tip_attach">
                               <p class="small text-body-secondary mb-0">Student clicks to attach a fresh tip. No additional config needed.</p>

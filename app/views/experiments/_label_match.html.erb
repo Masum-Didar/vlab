@@ -1,0 +1,53 @@
+<% labels = step.step_actions.first&.step_action_labels || [] %>
+<% shuffled_labels = labels.to_a.shuffle %>
+
+<div class="label-match"
+     data-controller="label-match"
+     data-label-match-action-id-value="<%= step.step_actions.first&.id %>"
+     data-label-match-experiment-id-value="<%= @experiment.id %>">
+  
+  <div class="label-match__instructions text-center mb-3">
+    <p class="text-secondary small">Drag each label card from the bottom and drop it onto the matching equipment image on the bench.</p>
+  </div>
+
+  <div class="label-match__status mb-3 text-center" data-label-match-target="status">
+    <span class="badge bg-secondary"><%= labels.count %> items to match</span>
+  </div>
+
+  <div class="label-match__dropzones" data-label-match-target="dropzoneContainer">
+    <% labels.each do |label| %>
+      <div class="label-match__dropzone d-flex flex-column align-items-center justify-content-between p-2 border rounded bg-white text-center"
+           style="min-height: 9rem;"
+           data-label-match-target="dropZone"
+           data-expected-label="<%= label.label_text %>"
+           data-action="dragover->label-match#dragOver drop->label-match#drop">
+        
+        <div class="label-match__dropzone-visual w-100 d-flex align-items-center justify-content-center mb-2" 
+             style="height: 5rem; background: #f8fafc; border-radius: 6px; overflow: hidden;">
+          <% if label.equipment && label.equipment.image.attached? %>
+            <%= image_tag label.equipment.image, alt: label.equipment.name, style: "max-width: 100%; max-height: 100%; object-fit: contain;" %>
+          <% else %>
+            <span class="label-match__dropzone-icon text-muted fw-bold"><%= label.label_text.first(2).upcase %></span>
+          <% end %>
+        </div>
+        
+        <span class="label-match__dropzone-name fw-semibold small text-muted mb-1"><%= label.equipment&.name || label.label_text %></span>
+        <span class="label-match__dropzone-label label-match__dropzone-label--placed small text-success fw-bold" data-label-match-target="placedLabel"></span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="label-match__labels border rounded p-3 bg-light" data-label-match-target="labelsContainer">
+    <% shuffled_labels.each do |label| %>
+      <div class="label-match__draggable shadow-sm bg-primary text-white font-weight-bold px-3 py-2 rounded cursor-grab"
+           draggable="true"
+           data-label-match-target="draggable"
+           data-label-text="<%= label.label_text %>"
+           data-action="dragstart->label-match#dragStart dragend->label-match#dragEnd">
+        <%= label.label_text %>
+      </div>
+    <% end %>
+  </div>
+
+  <input type="hidden" name="selected_labels" data-label-match-target="input" data-action-input>
+</div>

@@ -8,43 +8,7 @@
   </div>
 </header>
 
-<%= form_with model: @assignment, url: faculty_assignments_path, class: "admin-panel", local: true do |f| %>
-  <% if @assignment.errors.any? %>
-    <div class="alert alert-danger">
-      <p><%= pluralize(@assignment.errors.count, "error") %>:</p>
-      <ul class="mb-0">
-        <% @assignment.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="mb-3">
-    <%= f.label :classroom_id, "Classroom", class: "form-label fw-semibold" %>
-    <div class="d-flex gap-2 align-items-start">
-      <%= f.collection_select :classroom_id, @classrooms, :id, :name, { prompt: "Select classroom" }, class: "form-select", style: "max-width: 24rem;" %>
-      <%= link_to "+ New classroom", new_faculty_classroom_path, class: "btn btn-outline-primary btn-sm mt-0", target: "_blank", rel: "noopener" %>
-    </div>
-  </div>
-
-  <div class="mb-3">
-    <%= f.label :experiment_id, "Experiment", class: "form-label fw-semibold" %>
-    <%= f.collection_select :experiment_id, @experiments, :id, :title, { prompt: "Select experiment" }, class: "form-select", style: "max-width: 24rem;" %>
-  </div>
-
-  <div class="mb-3">
-    <%= f.label :due_date, "Due date (optional)", class: "form-label fw-semibold" %>
-    <%= f.date_field :due_date, class: "form-control", style: "max-width: 16rem;" %>
-  </div>
-
-  <div class="mb-3">
-    <%= f.label :status, "Status", class: "form-label fw-semibold" %>
-    <%= f.select :status, Assignment.statuses.keys.map { |s| [s.titleize, s] }, {}, class: "form-select", style: "max-width: 12rem;" %>
-  </div>
-
-  <div class="d-flex gap-2">
-    <%= f.submit "Assign", class: "btn btn-primary" %>
-    <%= link_to "Cancel", faculty_assignments_path, class: "btn btn-outline-secondary" %>
-  </div>
-<% end %>
+<%= render "form", assignment: @assignment, 
+                  classrooms: @classrooms, 
+                  experiments: @experiments, 
+                  all_quizzes: @all_quizzes %>

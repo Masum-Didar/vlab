@@ -3,8 +3,9 @@ class Admin::DashboardController < Admin::BaseController
   def index
     @experiments_count = Experiment.count
     @users_count       = User.count
-    @active_count      = 12 # Example
+    @active_count      = LabSession.where(status: :started).count rescue 0
     @pending_count     = Experiment.where(status: :pending).count
+    @pending_faculty_count = User.where(role: :faculty, is_approved: false).count
 
     @completed_count   = Experiment.where(status: :completed).count
     @failed_count      = Experiment.where(status: :failed).count

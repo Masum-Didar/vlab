@@ -1,0 +1,78 @@
+<div class="conclusion-table-container"
+     data-controller="conclusion-table">
+  
+  <div class="table-responsive border rounded mb-3">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Sample</th>
+          <th>Well</th>
+          <th>Bands (bp migration)</th>
+          <th>Genotype Classification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Sample A</strong></td>
+          <td class="text-body-secondary">Well 2</td>
+          <td><span class="badge text-bg-secondary">50 bp</span> <span class="badge text-bg-secondary">130 bp</span></td>
+          <td>
+            <select class="form-select form-select-sm" 
+                    data-conclusion-table-target="genotypeSelect" 
+                    data-sample="a" 
+                    data-action="change->conclusion-table#updateAnswers">
+              <option value="">Select genotype...</option>
+              <option value="Wild Type">Wild Type</option>
+              <option value="Mutant">Mutant</option>
+              <option value="Heterozygous">Heterozygous</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Sample B</strong></td>
+          <td class="text-body-secondary">Well 3</td>
+          <td><span class="badge text-bg-secondary">130 bp</span></td>
+          <td>
+            <select class="form-select form-select-sm" 
+                    data-conclusion-table-target="genotypeSelect" 
+                    data-sample="b" 
+                    data-action="change->conclusion-table#updateAnswers">
+              <option value="">Select genotype...</option>
+              <option value="Wild Type">Wild Type</option>
+              <option value="Mutant">Mutant</option>
+              <option value="Heterozygous">Heterozygous</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Sample C</strong></td>
+          <td class="text-body-secondary">Well 4</td>
+          <td><span class="badge text-bg-secondary">50 bp</span> <span class="badge text-bg-secondary">90 bp</span> <span class="badge text-bg-secondary">130 bp</span></td>
+          <td>
+            <select class="form-select form-select-sm" 
+                    data-conclusion-table-target="genotypeSelect" 
+                    data-sample="c" 
+                    data-action="change->conclusion-table#updateAnswers">
+              <option value="">Select genotype...</option>
+              <option value="Wild Type">Wild Type</option>
+              <option value="Mutant">Mutant</option>
+              <option value="Heterozygous">Heterozygous</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex flex-column gap-2 mb-3">
+    <button type="button" 
+            class="btn btn-primary btn-sm w-100" 
+            data-action="click->conclusion-table#submit" 
+            data-conclusion-table-target="submitButton" 
+            disabled>
+      Submit Genotype Classification
+    </button>
+  </div>
+
+  <input type="hidden" name="conclusion_data" data-conclusion-table-target="input" data-action-input>
+</div>

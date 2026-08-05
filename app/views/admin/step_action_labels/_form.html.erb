@@ -12,6 +12,11 @@
     <%= f.text_field :image_url, class: "form-control" %>
   </div>
 
+  <div class="mb-3">
+    <%= f.label :equipment_id, "Associated Equipment (for drag & drop)" %>
+    <%= f.collection_select :equipment_id, Equipment.order(:name), :id, :name, { prompt: "Select associated equipment..." }, class: "form-select" %>
+  </div>
+
   <div class="row g-2">
     <div class="col-md-6">
       <%= f.label :position %>
