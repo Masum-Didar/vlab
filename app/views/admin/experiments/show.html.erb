@@ -88,10 +88,12 @@
                       <em><%= step.timer_duration %> sec</em>
                     <% end %>
                     <% if step.step_actions.any? %>
-                      <div class="admin-action-preview">
+                      <div class="admin-action-preview mt-2">
                         <% step.step_actions.each do |action| %>
-                          <span class="badge text-bg-info"><%= action.action_type.humanize %></span>
-                          <small><%= step_action_summary(action) %></small>
+                          <%= link_to admin_step_action_path(action), class: "text-decoration-none d-inline-flex align-items-center gap-2 mb-1 me-2" do %>
+                            <span class="badge text-bg-info"><%= action.action_type.humanize %></span>
+                            <small class="text-secondary text-hover-underline"><%= step_action_summary(action) %></small>
+                          <% end %>
                         <% end %>
                       </div>
                     <% end %>

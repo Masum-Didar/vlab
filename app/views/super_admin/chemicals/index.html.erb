@@ -1,0 +1,32 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Global Chemicals</h2>
+  <%= link_to "Add Chemical", new_super_admin_chemical_path, class: "btn btn-danger" %>
+</div>
+
+<table class="table table-bordered bg-white">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Formula</th>
+    <th>State</th>
+    <th>Description</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @chemicals.each do |chemical| %>
+    <tr>
+      <td><strong><%= chemical.name %></strong></td>
+      <td><%= chemical.formula.presence || "-" %></td>
+      <td><span class="badge bg-light text-dark border"><%= chemical.state&.titleize || "-" %></span></td>
+      <td><%= truncate(chemical.description, length: 80) %></td>
+      <td class="text-end">
+        <%= link_to "Edit", edit_super_admin_chemical_path(chemical), class: "btn btn-sm btn-outline-primary" %>
+        <%= link_to "Delete", super_admin_chemical_path(chemical),
+                    data: { turbo_method: :delete, turbo_confirm: "Are you sure?" },
+                    class: "btn btn-sm btn-outline-danger" %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

@@ -10,7 +10,7 @@ class Admin::StepActionLabelsController < Admin::BaseController
     if @step_action_label.save
       redirect_to admin_step_action_path(@step_action), notice: "Label added"
     else
-      render :new
+      redirect_to admin_step_action_path(@step_action), alert: "Failed to add label: #{@step_action_label.errors.full_messages.join(', ')}"
     end
   end
 

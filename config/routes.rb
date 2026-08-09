@@ -46,6 +46,9 @@ Rails.application.routes.draw do
         delete :reject
       end
     end
+    resources :equipments
+    resources :chemicals
+    resources :containers
     root to: "dashboard#index"
   end
 

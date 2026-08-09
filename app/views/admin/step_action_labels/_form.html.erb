@@ -8,8 +8,9 @@
   </div>
 
   <div class="mb-3">
-    <%= f.label :image_url, "Reference image URL" %>
-    <%= f.text_field :image_url, class: "form-control" %>
+    <%= f.label :image_url, "Reference image URL (Optional)" %>
+    <%= f.text_field :image_url, class: "form-control", placeholder: "https://example.com/image.png" %>
+    <div class="form-text text-muted">You can leave this blank if you select an <strong>Associated Equipment</strong> below.</div>
   </div>
 
   <div class="mb-3">
